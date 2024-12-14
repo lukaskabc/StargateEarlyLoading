@@ -1,7 +1,9 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
+import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,17 +12,30 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
+    public static final String ASSETS_DIRECTORY = "assets";
     private static final Logger LOG = LogManager.getLogger();
+    public static int globalAlpha = 255;
     private final RefDisplayWindow accessor;
 
     public StargateEarlyLoadingWindow() {
         this.accessor = new RefDisplayWindow(this);
+    }
+
+    private static List<RenderElement> constructElements() {
+        return List.of(
+                DarkSkyBackground.create()
+        );
     }
 
     @Override
@@ -30,17 +45,16 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     @Override
     public Runnable start(@Nullable String mcVersion, String forgeVersion) {
-        final var renderScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            final var thread = Executors.defaultThreadFactory().newThread(r);
+        final ScheduledExecutorService renderScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            final Thread thread = Executors.defaultThreadFactory().newThread(r);
             thread.setDaemon(true);
             return thread;
         });
         accessor.setRenderScheduler(renderScheduler);
         initWindow(mcVersion);
         final var initializationFuture = renderScheduler.schedule(() -> {
-            final Object result = accessor.initRender(mcVersion, forgeVersion);
+            accessor.initRender(mcVersion, forgeVersion);
             afterInitRender();
-            return result;
         }, 1, TimeUnit.MILLISECONDS);
         accessor.setInitializationFuture(initializationFuture);
         return this::periodicTick;
@@ -52,10 +66,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * with other scheduled tasks.
      */
     private void afterInitRender() {
-        final var elements = accessor.getElements();
-        final var first = elements.getFirst();
+        final List<RenderElement> elements = accessor.getElements();
+        final RenderElement first = elements.getFirst();
         elements.clear();
-        elements.add(first);
+        elements.addAll(constructElements());
+//        elements.add(first);
     }
 
     @Override
@@ -65,5 +80,16 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         var clz = Class.forName(fm, "net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay");
         var methods = Arrays.stream(clz.getMethods()).filter(m -> Modifier.isStatic(m.getModifiers())).collect(Collectors.toMap(Method::getName, Function.identity()));
         accessor.setLoadingOverlay(methods.get("newInstance"));
+    }
+
+    @Override
+    public <T> Supplier<T> loadingOverlay(Supplier<?> mc, Supplier<?> ri, Consumer<Optional<Throwable>> ex, boolean fade) {
+        throw new RuntimeException("Loading finished");
+    }
+
+    @Override
+    public void render(int alpha) {
+        globalAlpha = alpha;
+        super.render(alpha);
     }
 }
