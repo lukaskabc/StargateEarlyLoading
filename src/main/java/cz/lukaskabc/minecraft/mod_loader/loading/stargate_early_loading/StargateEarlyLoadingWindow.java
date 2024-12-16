@@ -29,6 +29,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final RefDisplayWindow accessor;
 
     public StargateEarlyLoadingWindow() {
+        //ByteBuddyAgent.install();
         this.accessor = new RefDisplayWindow(this);
     }
 

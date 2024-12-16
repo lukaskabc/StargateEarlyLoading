@@ -53,6 +53,7 @@ public class RefRenderElement extends ReflectionAccessor {
                 new Class[]{INITIALIZER_CLASS},
                 (proxy, method, args) -> {
                     if (method.getName().equals("get")) {
+
                         return createInternalRenderer(textureFileName, size, textureNumber, positionAndColour);
                     }
                     if (!method.canAccess(proxy)) {
@@ -76,13 +77,14 @@ public class RefRenderElement extends ReflectionAccessor {
                         final RenderElement.DisplayContext ctx = (RenderElement.DisplayContext) renderArgs[1];
                         final int frame = (int) renderArgs[2];
                         // from RenderElement#Initializer
-                        ctx.elementShader().updateTextureUniform(textureNumber + INDEX_TEXTURE_OFFSET);
-                        ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
-                        try {
+                        //ctx.elementShader().updateTextureUniform(textureNumber);
+                        //ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
+                        positionAndColour.accept(bb, ctx, imgSize, frame);
+                        /*try {
                             return renderTexture.invoke(null, bb, ctx, frame, imgSize, proxiedTextureRenderer);
                         } catch (InvocationTargetException | IllegalAccessException e) {
                             throw new ReflectionException(e);
-                        }
+                        }*/
                     }
                     if (!renderMethod.canAccess(renderProxy)) {
                         renderMethod.setAccessible(true);
