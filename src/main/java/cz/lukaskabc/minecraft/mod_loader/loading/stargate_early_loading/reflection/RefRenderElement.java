@@ -6,7 +6,6 @@ import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.function.Supplier;
 
@@ -16,6 +15,7 @@ public class RefRenderElement extends ReflectionAccessor {
     public static final Class<?> TEXTURE_RENDERER_CLASS;
     public static final Class<?> RENDERER_CLASS;
     public static final Class<?> INITIALIZER_CLASS;
+    public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
 
     static {
         try {
@@ -64,10 +64,8 @@ public class RefRenderElement extends ReflectionAccessor {
     }
 
     private static Object createInternalRenderer(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
-        final int INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET");
+        final int INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET") + LOADING_INDEX_TEXTURE_OFFSET;
         final int[] imgSize = STBHelper.loadTextureFromClasspath(textureFileName, size, GL_TEXTURE0 + textureNumber + INDEX_TEXTURE_OFFSET);
-        final Method renderTexture = getMethod(RenderElement.class, "renderTexture", SimpleBufferBuilder.class, RenderElement.DisplayContext.class, int.class, int[].class, TEXTURE_RENDERER_CLASS);
-        final Object proxiedTextureRenderer = proxyTextureRenderer(positionAndColour);
         return Proxy.newProxyInstance(RENDERER_CLASS.getClassLoader(),
                 new Class[]{RENDERER_CLASS},
                 (renderProxy, renderMethod, renderArgs) -> {
@@ -77,14 +75,12 @@ public class RefRenderElement extends ReflectionAccessor {
                         final RenderElement.DisplayContext ctx = (RenderElement.DisplayContext) renderArgs[1];
                         final int frame = (int) renderArgs[2];
                         // from RenderElement#Initializer
-                        //ctx.elementShader().updateTextureUniform(textureNumber);
-                        //ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
+                        ctx.elementShader().updateTextureUniform(textureNumber + INDEX_TEXTURE_OFFSET);
+                        ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
+                        bb.begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
                         positionAndColour.accept(bb, ctx, imgSize, frame);
-                        /*try {
-                            return renderTexture.invoke(null, bb, ctx, frame, imgSize, proxiedTextureRenderer);
-                        } catch (InvocationTargetException | IllegalAccessException e) {
-                            throw new ReflectionException(e);
-                        }*/
+                        bb.draw();
+                        return null;
                     }
                     if (!renderMethod.canAccess(renderProxy)) {
                         renderMethod.setAccessible(true);

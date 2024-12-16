@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
+import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
@@ -13,14 +14,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final String ASSETS_DIRECTORY = "assets";
@@ -42,6 +42,14 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     @Override
     public String name() {
         return "StargateEarlyLoading";
+    }
+
+    @Override
+    public Runnable initialize(String[] arguments) {
+        final Runnable result = super.initialize(arguments);
+        // force black colour scheme
+        accessor.setColourScheme(ColourScheme.BLACK);
+        return result;
     }
 
     @Override
@@ -67,11 +75,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * with other scheduled tasks.
      */
     private void afterInitRender() {
+        glfwMakeContextCurrent(accessor.getGlWindow());
         final List<RenderElement> elements = accessor.getElements();
-        final RenderElement first = elements.getFirst();
         elements.clear();
         elements.addAll(constructElements());
-//        elements.add(first);
+        glfwMakeContextCurrent(0);
     }
 
     @Override
@@ -81,11 +89,6 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         var clz = Class.forName(fm, "net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay");
         var methods = Arrays.stream(clz.getMethods()).filter(m -> Modifier.isStatic(m.getModifiers())).collect(Collectors.toMap(Method::getName, Function.identity()));
         accessor.setLoadingOverlay(methods.get("newInstance"));
-    }
-
-    @Override
-    public <T> Supplier<T> loadingOverlay(Supplier<?> mc, Supplier<?> ri, Consumer<Optional<Throwable>> ex, boolean fade) {
-        throw new RuntimeException("Loading finished");
     }
 
     @Override

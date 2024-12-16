@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
+import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import org.jspecify.annotations.NonNull;
@@ -72,5 +73,13 @@ public class RefDisplayWindow extends ReflectionAccessor {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ReflectionException(e);
         }
+    }
+
+    public long getGlWindow() {
+        return (long) getFieldValue(clazz, target, "window");
+    }
+
+    public void setColourScheme(ColourScheme colourScheme) {
+        setFieldValue("colourScheme", colourScheme);
     }
 }
