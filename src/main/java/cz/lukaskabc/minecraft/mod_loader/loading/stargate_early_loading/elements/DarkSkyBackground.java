@@ -16,7 +16,12 @@ public class DarkSkyBackground {
     }
 
     private static void render(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
-        QuadHelper.loadQuad(bb, 0f, ctx.width(), 0f, ctx.height(), 0f, 1f, 0f, 1f, (255 << 24) | 0xFFFFFF);
+        float widthScale = (float) ctx.width() / imgSize[0];
+        float heightScale = (float) ctx.height() / imgSize[1];
+        float scale = Math.max(widthScale, heightScale);
+        float x1 = imgSize[0] * scale;
+        float y1 = imgSize[1] * scale;
+        QuadHelper.loadQuad(bb, 0f, x1, 0f, y1, 0f, 1f, 0f, 1f, (255 << 24) | 0xFFFFFF);
     }
 
     private static void foxRender(SimpleBufferBuilder bb, RenderElement.DisplayContext context, int[] size, int frame) {

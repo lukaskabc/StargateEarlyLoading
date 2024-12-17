@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
@@ -29,7 +32,6 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final RefDisplayWindow accessor;
 
     public StargateEarlyLoadingWindow() {
-        //ByteBuddyAgent.install();
         this.accessor = new RefDisplayWindow(this);
     }
 
@@ -76,10 +78,32 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      */
     private void afterInitRender() {
         glfwMakeContextCurrent(accessor.getGlWindow());
+        recreateContext();
         final List<RenderElement> elements = accessor.getElements();
         elements.clear();
         elements.addAll(constructElements());
         glfwMakeContextCurrent(0);
+    }
+
+    private void recreateContext() {
+        final RenderElement.DisplayContext oldContext = accessor.getContext();
+        final Object oldFrameBuffer = accessor.getFramebuffer();
+        final int[] width = new int[1];
+        final int[] height = new int[1];
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        accessor.setFBSize(width[0], height[0]);
+        final RenderElement.DisplayContext context = new RenderElement.DisplayContext(width[0], height[0], oldContext.scale(), oldContext.elementShader(), oldContext.colourScheme(), oldContext.performance());
+        accessor.setContext(context);
+        try {
+            final Constructor<?> constructor = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredConstructor(RenderElement.DisplayContext.class);
+            constructor.setAccessible(true);
+            accessor.setFrameBuffer(constructor.newInstance(context));
+            final Method close = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredMethod("close");
+            close.setAccessible(true);
+            close.invoke(oldFrameBuffer);
+        } catch (Exception e) {
+            throw new ReflectionException(e);
+        }
     }
 
     @Override

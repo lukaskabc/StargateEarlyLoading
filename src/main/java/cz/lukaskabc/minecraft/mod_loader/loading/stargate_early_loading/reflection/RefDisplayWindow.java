@@ -82,4 +82,29 @@ public class RefDisplayWindow extends ReflectionAccessor {
     public void setColourScheme(ColourScheme colourScheme) {
         setFieldValue("colourScheme", colourScheme);
     }
+
+    public boolean isMaximized() {
+        return (boolean) getFieldValue(clazz, target, "maximized");
+    }
+
+    public void setFBSize(int width, int height) {
+        setFieldValue("fbWidth", width);
+        setFieldValue("fbHeight", height);
+    }
+
+    public RenderElement.DisplayContext getContext() {
+        return (RenderElement.DisplayContext) getFieldValue(clazz, target, "context");
+    }
+
+    public void setContext(RenderElement.DisplayContext context) {
+        setFieldValue("context", context);
+    }
+
+    public void setFrameBuffer(Object framebuffer) {
+        setFieldValue("framebuffer", framebuffer);
+    }
+
+    public Object getFramebuffer() {
+        return getFieldValue(clazz, target, "framebuffer");
+    }
 }
