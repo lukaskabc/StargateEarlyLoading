@@ -1,6 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.PegasusRefreshedLoop;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -36,9 +38,10 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     }
 
     private static List<RenderElement> constructElements() {
-        return List.of(
-                DarkSkyBackground.create()
-        );
+        final List<RenderElement> elements = new ArrayList<>();
+        //elements.add(DarkSkyBackground.create());
+        elements.addAll(PegasusRefreshedLoop.create());
+        return elements;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     public Runnable initialize(String[] arguments) {
         final Runnable result = super.initialize(arguments);
         // force black colour scheme
-        accessor.setColourScheme(ColourScheme.BLACK);
+        //accessor.setColourScheme(ColourScheme.BLACK);
         return result;
     }
 
