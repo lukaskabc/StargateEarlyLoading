@@ -31,9 +31,17 @@ public class RefRenderElement extends ReflectionAccessor {
         super(target, RenderElement.class);
     }
 
-    public static RenderElement create(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
+    public static RenderElement createTriangular(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
         try {
-            return constructor(initializeTexture(textureFileName, size, textureNumber, positionAndColour));
+            return constructor(initializeTexture(textureFileName, size, textureNumber, positionAndColour, SimpleBufferBuilder.Mode.TRIANGLES));
+        } catch (NoSuchMethodException e) {
+            throw new ReflectionException(e);
+        }
+    }
+
+    public static RenderElement createQuad(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
+        try {
+            return constructor(initializeTexture(textureFileName, size, textureNumber, positionAndColour, SimpleBufferBuilder.Mode.QUADS));
         } catch (NoSuchMethodException e) {
             throw new ReflectionException(e);
         }
@@ -48,13 +56,12 @@ public class RefRenderElement extends ReflectionAccessor {
     }
 
     @SuppressWarnings("unchecked")
-    public static Supplier<?> initializeTexture(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) throws NoSuchMethodException {
+    public static Supplier<?> initializeTexture(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour, SimpleBufferBuilder.Mode bufferMode) throws NoSuchMethodException {
         return (Supplier<?>) Proxy.newProxyInstance(INITIALIZER_CLASS.getClassLoader(),
                 new Class[]{INITIALIZER_CLASS},
                 (proxy, method, args) -> {
                     if (method.getName().equals("get")) {
-
-                        return createInternalRenderer(textureFileName, size, textureNumber, positionAndColour);
+                        return createInternalRenderer(textureFileName, size, textureNumber, positionAndColour, bufferMode);
                     }
                     if (!method.canAccess(proxy)) {
                         method.setAccessible(true);
@@ -63,7 +70,7 @@ public class RefRenderElement extends ReflectionAccessor {
                 });
     }
 
-    private static Object createInternalRenderer(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
+    private static Object createInternalRenderer(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour, SimpleBufferBuilder.Mode bufferMode) {
         final int INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET") + LOADING_INDEX_TEXTURE_OFFSET;
         final int[] imgSize = STBHelper.loadTextureFromClasspath(textureFileName, size, GL_TEXTURE0 + textureNumber + INDEX_TEXTURE_OFFSET);
         return Proxy.newProxyInstance(RENDERER_CLASS.getClassLoader(),
@@ -77,7 +84,7 @@ public class RefRenderElement extends ReflectionAccessor {
                         // from RenderElement#Initializer
                         ctx.elementShader().updateTextureUniform(textureNumber + INDEX_TEXTURE_OFFSET);
                         ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
-                        bb.begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
+                        bb.begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, bufferMode);
                         positionAndColour.accept(bb, ctx, imgSize, frame);
                         bb.draw();
                         return null;

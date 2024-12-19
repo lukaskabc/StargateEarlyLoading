@@ -12,7 +12,7 @@ public class DarkSkyBackground {
     private static final String TEXTURE = "dark_sky.png";
 
     public static RenderElement create() {
-        return RefRenderElement.create(ASSETS_DIRECTORY + "/" + TEXTURE, 34881, 1, DarkSkyBackground::render);
+        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/" + TEXTURE, 34881, 1, DarkSkyBackground::render);
     }
 
     private static void render(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
