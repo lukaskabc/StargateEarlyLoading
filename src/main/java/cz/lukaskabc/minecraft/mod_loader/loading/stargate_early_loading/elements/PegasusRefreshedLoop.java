@@ -25,6 +25,9 @@ public class PegasusRefreshedLoop {
 
     private static float baseX = 0;
     private static float baseY = 0;
+    private static float targetX = 0;
+    private static float targetY = 0;
+    private static float scale = 1;
 
     public static List<RenderElement> create() {
         return List.of(
@@ -42,7 +45,7 @@ public class PegasusRefreshedLoop {
     }
 
     public static void renderSymbolAnimation(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
-        int symbolId = (frame / 10) % SYMBOL_COUNT;
+        int symbolId = (frame) % SYMBOL_COUNT;
         renderSymbol(bb, symbolId, imgSize);
     }
 
@@ -52,10 +55,19 @@ public class PegasusRefreshedLoop {
         final float symbolLeft = 1f / imgSize[0] * symbolX;
         final float symbolRight = 1f / imgSize[0] * (symbolX + SYMBOL_SIZE);
 
-        bb.pos(baseX + SYMBOL_TOP_LEFT, baseY + SYMBOL_TOP).tex(symbolLeft, 0).colour(SYMBOL_COLOR).endVertex();
-        bb.pos(baseX + SYMBOL_TOP_RIGHT, baseY + SYMBOL_TOP).tex(symbolRight, 0).colour(SYMBOL_COLOR).endVertex();
-        bb.pos(baseX + SYMBOL_BOTTOM_LEFT, baseY + SYMBOL_BOTTOM).tex(symbolLeft, 1).colour(SYMBOL_COLOR).endVertex();
-        bb.pos(baseX + SYMBOL_BOTTOM_RIGHT, baseY + SYMBOL_BOTTOM).tex(symbolRight, 1).colour(SYMBOL_COLOR).endVertex();
+        final float centerX = 954f / 2 * scale;
+        final float centerY = 947f / 2 * scale;
+
+        final double angle = Math.toRadians((356 + (10 * symbol)) % 360);
+        final double angleSize = Math.toRadians(10); // 10 = 360 / FRAME_COUNT    // FRAME_COUNT = Symbol count
+
+        final float outerRadius = centerY - (SYMBOL_TOP + 5) * scale;
+        final float innerRadius = centerY - (SYMBOL_BOTTOM - 5) * scale;
+
+        bb.pos(baseX + centerX + outerRadius * (float) Math.cos(angle), baseY + centerY + outerRadius * (float) Math.sin(angle)).tex(symbolLeft, 0).colour(SYMBOL_COLOR).endVertex();
+        bb.pos(baseX + centerX + outerRadius * (float) Math.cos(angle + angleSize), baseY + centerY + outerRadius * (float) Math.sin(angle + angleSize)).tex(symbolRight, 0).colour(SYMBOL_COLOR).endVertex();
+        bb.pos(baseX + centerX + innerRadius * (float) Math.cos(angle), baseY + centerY + innerRadius * (float) Math.sin(angle)).tex(symbolLeft, 1).colour(SYMBOL_COLOR).endVertex();
+        bb.pos(baseX + centerX + innerRadius * (float) Math.cos(angle + angleSize), baseY + centerY + innerRadius * (float) Math.sin(angle + angleSize)).tex(symbolRight, 1).colour(SYMBOL_COLOR).endVertex();
 
         /*
 
@@ -90,14 +102,14 @@ public class PegasusRefreshedLoop {
     public static void renderStaticGate(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
         float widthScale = (float) ctx.width() / imgSize[0];
         float heightScale = (float) ctx.height() / imgSize[1];
-        float scale = Math.min(widthScale, heightScale);
+        scale = Math.max(1, Math.min(widthScale, heightScale));
 
-        float x1 = Math.min(imgSize[0] * scale, imgSize[0]);
-        float y1 = Math.min(imgSize[1] * scale, imgSize[1]);
+        targetX = imgSize[0] * scale;
+        targetY = imgSize[1] * scale;
 
-        baseX = (ctx.width() - x1) / 2;
-        baseY = (ctx.height() - y1) / 2;
+        baseX = (ctx.width() - targetX) / 2;
+        baseY = (ctx.height() - targetY) / 2;
 
-        QuadHelper.loadQuad(bb, baseX, baseX + x1, baseY, baseY + y1, 0f, 1f, 0f, 1f, COLOR);
+        QuadHelper.loadQuad(bb, baseX, baseX + targetX, baseY, baseY + targetY, 0f, 1f, 0f, 1f, COLOR);
     }
 }
