@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  * Moved for execution on different class loader.
  * All rights belong to the original authors.
+ * Changes:
+ * - Magnification filter to nearest
  */
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original;
 
@@ -49,7 +51,7 @@ public class STBHelper {
         var texid = glGenTextures();
         glActiveTexture(textureNumber);
         glBindTexture(GL_TEXTURE_2D, texid);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lw[0], lh[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
         glActiveTexture(GL_TEXTURE0);

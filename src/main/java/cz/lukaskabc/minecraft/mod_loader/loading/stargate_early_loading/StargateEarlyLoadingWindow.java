@@ -4,7 +4,6 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.PegasusRefreshedLoop;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
-import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
@@ -39,7 +38,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     private static List<RenderElement> constructElements() {
         final List<RenderElement> elements = new ArrayList<>();
-        //elements.add(DarkSkyBackground.create());
+        elements.add(DarkSkyBackground.create());
         elements.addAll(PegasusRefreshedLoop.create());
         return elements;
     }
