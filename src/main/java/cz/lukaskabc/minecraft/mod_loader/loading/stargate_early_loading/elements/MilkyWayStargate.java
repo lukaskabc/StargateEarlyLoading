@@ -39,6 +39,7 @@ public class MilkyWayStargate {
     protected static final float DIVIDER_CENTER = DIVIDER_THICKNESS / 2;
     protected static final float DIVIDER_HEIGHT = 8F / 16;
     protected static final float DIVIDER_OFFSET = 0.5F / 16;
+    protected static final float CHEVRON_ANGLE = 360F / 9;
     private static final int COLOR = (255 << 24) | 0xFFFFFF;
     private static final float centerX = 954f / 2;
     private static final float centerY = 947f / 2;
@@ -76,11 +77,24 @@ public class MilkyWayStargate {
     }
 
     private static void renderSymbolDividers(final SimpleBufferBuilder bb, final int j, final float rotation) {
-        final double angleHalf = SYMBOL_ANGLE / 2;
-        final double angle = Math.toRadians(-90 - SYMBOL_ANGLE * j);
-        //final double angle1 = Math.toRadians(-90 - SYMBOL_ANGLE * j);
+        final double angle = Math.toRadians(-90 - SYMBOL_ANGLE * j + SYMBOL_ANGLE / 2f + rotation - 1);
+        final double angle1 = Math.toRadians(-90 - SYMBOL_ANGLE * j + SYMBOL_ANGLE / 2f + rotation - 0.5);
 
+        final float cos = (float) Math.cos(angle);
+        final float sin = (float) Math.sin(angle);
+        final float cos1 = (float) Math.cos(angle1);
+        final float sin1 = (float) Math.sin(angle1);
 
+        final float x0 = SCALE * STARGATE_SYMBOL_RING_OUTER_HEIGHT * cos;
+        final float y0 = SCALE * STARGATE_SYMBOL_RING_OUTER_HEIGHT * sin;
+        final float x1 = SCALE * STARGATE_SYMBOL_RING_OUTER_HEIGHT * cos1;
+        final float y1 = SCALE * STARGATE_SYMBOL_RING_OUTER_HEIGHT * sin1;
+        final float x2 = SCALE * STARGATE_SYMBOL_RING_INNER_HEIGHT * cos;
+        final float y2 = SCALE * STARGATE_SYMBOL_RING_INNER_HEIGHT * sin;
+        final float x3 = SCALE * STARGATE_SYMBOL_RING_INNER_HEIGHT * cos1;
+        final float y3 = SCALE * STARGATE_SYMBOL_RING_INNER_HEIGHT * sin1;
+
+        renderTexture(bb, x0, y0, x1, y1, x2, y2, x3, y3, 10 / 64f, 43 / 64f, 10 / 64f, SYMBOL_TEY1);
     }
 
 
