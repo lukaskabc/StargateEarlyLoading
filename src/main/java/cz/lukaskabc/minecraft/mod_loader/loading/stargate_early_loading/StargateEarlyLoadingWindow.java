@@ -1,7 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.PegasusRefreshedLoop;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MilkyWayStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
@@ -38,8 +37,9 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     private static List<RenderElement> constructElements() {
         final List<RenderElement> elements = new ArrayList<>();
-        elements.add(DarkSkyBackground.create());
-        elements.addAll(PegasusRefreshedLoop.create());
+//        elements.add(DarkSkyBackground.create());
+//        elements.addAll(PegasusRefreshedLoop.create());
+        elements.add(MilkyWayStargate.create());
         return elements;
     }
 
@@ -121,5 +121,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     public void render(int alpha) {
         globalAlpha = alpha;
         super.render(alpha);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        throw new RuntimeException("Loading completed");
     }
 }
