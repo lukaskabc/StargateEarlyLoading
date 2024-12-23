@@ -6,6 +6,8 @@ import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
 import org.joml.Matrix2f;
 import org.joml.Vector2f;
 
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
+
 public abstract class GenericStargate {
     public static final float SCALE = 120;
     protected static final float DEFAULT_RADIUS = 3.5F;
@@ -16,7 +18,6 @@ public abstract class GenericStargate {
     protected static final float DEFAULT_ANGLE = 360F / DEFAULT_SIDES;
     protected static final float NUMBER_OF_CHEVRONS = 9;
     protected static final float CHEVRON_ANGLE = 360F / 9;
-
 
     // Ring
     protected static final float STARGATE_RING_THICKNESS = 7F;
@@ -47,9 +48,7 @@ public abstract class GenericStargate {
     protected static final float DIVIDER_CENTER = DIVIDER_THICKNESS / 2;
     protected static final float DIVIDER_HEIGHT = 8F / 16;
     protected static final float DIVIDER_OFFSET = 0.5F / 16;
-    private static final int COLOR = (255 << 24) | 0xFFFFFF;
-    private static final float centerX = 954f / 2;
-    private static final float centerY = 947f / 2;
+    private static final Vector2f CENTER = new Vector2f(954f / 2, 947f / 2);
     protected final int symbolCount;
     protected final float symbolAngle;
     protected final float stargateSymbolRingOuterLength;
@@ -86,7 +85,7 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(texBase - STARGATE_RING_INNER_CENTER * 16, 33.5F - STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(texBase + STARGATE_RING_START_CENTER * 16, 33.5F - STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4);
+        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
     private static void renderOuterRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
@@ -111,19 +110,9 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(texBase - STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4);
+        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    private static void renderTexture(SimpleBufferBuilder bb, Vector2f v1, Vector2f v2, Vector2f v3, Vector2f v4, Vector2f u1, Vector2f u2, Vector2f u3, Vector2f u4) {
-        bbPosTex(bb, v2, u1);
-        bbPosTex(bb, v3, u2);
-        bbPosTex(bb, v1, u3);
-        bbPosTex(bb, v4, u4);
-    }
-
-    private static void bbPosTex(SimpleBufferBuilder bb, Vector2f v, Vector2f u) {
-        bb.pos(centerX + v.x(), centerY + v.y()).tex(u.x() / 64f, u.y() / 64f).colour(COLOR).endVertex();
-    }
 
     public void render(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
         final float rotation = ((frame / 5f) % 360) / 156f * 360F;
@@ -144,7 +133,7 @@ public abstract class GenericStargate {
         }
     }
 
-    private void renderSymbolDividers(SimpleBufferBuilder bb, Matrix2f m, int j, float rotation) {
+    protected void renderSymbolDividers(SimpleBufferBuilder bb, Matrix2f m, int j, float rotation) {
         Matrix2f matrix2f = new Matrix2f(m);
         matrix2f.rotate((float) Math.toRadians(j * -symbolAngle - symbolAngle / 2 + rotation));
 
@@ -163,10 +152,10 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(9.5F - DIVIDER_CENTER * 16, 46 - DIVIDER_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(9.5F + DIVIDER_CENTER * 16, 46 - DIVIDER_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4);
+        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    private void renderSymbolRing(SimpleBufferBuilder bb, Matrix2f m, int j, float rotation) {
+    protected void renderSymbolRing(SimpleBufferBuilder bb, Matrix2f m, int j, float rotation) {
         Matrix2f matrix2f = new Matrix2f(m);
         matrix2f.rotate((float) Math.toRadians(j * -symbolAngle + rotation));
 
@@ -185,6 +174,10 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(4 - stargateSymbolRingInnerCenter * 16, 46 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(4 + stargateSymbolRingOuterCenter * 16, 46 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4);
+        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+    }
+
+    protected void renderSymbols(SimpleBufferBuilder bb) {
+
     }
 }

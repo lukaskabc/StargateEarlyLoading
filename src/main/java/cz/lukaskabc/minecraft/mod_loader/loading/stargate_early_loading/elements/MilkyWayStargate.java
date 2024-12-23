@@ -7,6 +7,7 @@ import net.neoforged.fml.earlydisplay.RenderElement;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.ASSETS_DIRECTORY;
 
 public class MilkyWayStargate extends GenericStargate {
+
     public MilkyWayStargate() {
         super((short) 39);
     }
