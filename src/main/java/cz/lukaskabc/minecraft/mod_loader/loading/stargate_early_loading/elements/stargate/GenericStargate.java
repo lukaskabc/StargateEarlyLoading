@@ -4,29 +4,28 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
 import org.joml.Matrix2f;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
 import org.joml.Vector2f;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
 
 public abstract class GenericStargate {
     public static final float SCALE = 120;
+    public static final Vector2f CENTER = new Vector2f(954f / 2, 947f / 2);
     protected static final float DEFAULT_RADIUS = 3.5F;
     protected static final int DEFAULT_SIDES = 36;
     protected static final float DEFAULT_RING_HEIGHT = 1F;
     protected static final float STARGATE_RING_SHRINK = 0.001F;
-
     protected static final float DEFAULT_ANGLE = 360F / DEFAULT_SIDES;
     protected static final float NUMBER_OF_CHEVRONS = 9;
     protected static final float CHEVRON_ANGLE = 360F / 9;
-
     // Ring
     protected static final float STARGATE_RING_THICKNESS = 7F;
     protected static final float STARGATE_RING_OFFSET = STARGATE_RING_THICKNESS / 2 / 16;
-
     protected static final float STARGATE_RING_OUTER_RADIUS = DEFAULT_RADIUS - STARGATE_RING_SHRINK;
     protected static final float STARGATE_RING_OUTER_LENGTH = SGJourneyModel.getUsedWidth(DEFAULT_SIDES, STARGATE_RING_OUTER_RADIUS, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_OUTER_CENTER = STARGATE_RING_OUTER_LENGTH / 2;
-
     protected static final float STARGATE_RING_STOP_RADIUS = DEFAULT_RADIUS - 7F / 16;
     protected static final float STARGATE_RING_STOP_LENGTH = SGJourneyModel.getUsedWidth(DEFAULT_SIDES, STARGATE_RING_STOP_RADIUS, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_STOP_CENTER = STARGATE_RING_STOP_LENGTH / 2;
@@ -48,7 +47,6 @@ public abstract class GenericStargate {
     protected static final float DIVIDER_CENTER = DIVIDER_THICKNESS / 2;
     protected static final float DIVIDER_HEIGHT = 8F / 16;
     protected static final float DIVIDER_OFFSET = 0.5F / 16;
-    private static final Vector2f CENTER = new Vector2f(954f / 2, 947f / 2);
     protected final int symbolCount;
     protected final float symbolAngle;
     protected final float stargateSymbolRingOuterLength;
@@ -131,6 +129,8 @@ public abstract class GenericStargate {
             renderOuterRing(bb, m, j);
             renderInnerRing(bb, m, j);
         }
+
+        renderChevrons(bb, matrix2f);
     }
 
     protected void renderSymbolDividers(SimpleBufferBuilder bb, Matrix2f m, int j, float rotation) {
@@ -177,7 +177,44 @@ public abstract class GenericStargate {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
+    private void renderChevrons(SimpleBufferBuilder bb, Matrix2f matrix2f) {
+        // TODO: if engaged
+        renderPrimaryChevron(bb, matrix2f);
+        for (int chevron = 1; chevron < NUMBER_OF_CHEVRONS; chevron++) {
+            renderChevron(bb, matrix2f, chevron);
+        }
+    }
+
+    protected void renderChevron(SimpleBufferBuilder bufferBuilder, Matrix2f matrix2f, int chevron) {
+        // 3D matrix required for translation
+        Matrix3f matrix3f = new Matrix3f(matrix2f);
+        matrix3f.rotate(new Quaternionf().rotationZ((float) Math.toRadians(-CHEVRON_ANGLE * chevron)));
+
+        // translation
+        translate(matrix3f, 0, DEFAULT_RADIUS - (2.5f / 16));
+
+        GenericChevron.renderChevronLight(bufferBuilder, matrix3f, false);
+        GenericChevron.renderOuterChevronFront(bufferBuilder, matrix3f, false);
+    }
+
     protected void renderSymbols(SimpleBufferBuilder bb) {
 
+    }
+
+    public void translate(Matrix3f matrix3f, float x, float y) {
+        matrix3f.m20 += matrix3f.m00 * x + matrix3f.m10 * y;
+        matrix3f.m21 += matrix3f.m01 * x + matrix3f.m11 * y;
+        matrix3f.m22 += matrix3f.m02 * x + matrix3f.m12 * y;
+    }
+
+    protected void renderPrimaryChevron(SimpleBufferBuilder bb, Matrix2f matrix2f) {
+        // 3D matrix required for translation
+        Matrix3f matrix3f = new Matrix3f(matrix2f);
+        // translation
+        translate(matrix3f, 0, DEFAULT_RADIUS - (2.5f / 16));
+
+        GenericChevron.renderChevronLight(bb, matrix3f, false);
+        // if movie chevron
+        GenericChevron.renderOuterChevronFront(bb, matrix3f, false);
     }
 }
