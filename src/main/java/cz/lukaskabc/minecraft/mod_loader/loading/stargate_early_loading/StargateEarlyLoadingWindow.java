@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MilkyWayStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.MilkyWayStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import net.neoforged.fml.earlydisplay.ColourScheme;

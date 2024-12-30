@@ -78,9 +78,9 @@ public abstract class GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_START_CENTER * 16, 33.5F + STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(texBase + STARGATE_RING_INNER_CENTER * 16, 33.5F + STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(texBase - STARGATE_RING_INNER_CENTER * 16, 33.5F - STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_START_CENTER * 16, 33.5F - STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(texBase - STARGATE_RING_INNER_CENTER * 16, 33.5F + STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(texBase + STARGATE_RING_INNER_CENTER * 16, 33.5F + STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(texBase + STARGATE_RING_START_CENTER * 16, 33.5F - STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
 
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
@@ -103,9 +103,9 @@ public abstract class GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_STOP_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(texBase + STARGATE_RING_STOP_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(texBase - STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_STOP_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(texBase - STARGATE_RING_STOP_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
 
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
@@ -117,7 +117,7 @@ public abstract class GenericStargate {
 
         Matrix2f matrix2f = new Matrix2f();
         matrix2f.scale(SCALE);
-        matrix2f.rotate((float) Math.toRadians(180));
+        matrix2f.scale(-1); // rotate 180 degrees
         for (int j = 0; j < symbolCount; j++) {
             renderSymbolRing(bb, matrix2f, j, rotation);
             renderSymbolDividers(bb, matrix2f, j, rotation);
@@ -125,7 +125,7 @@ public abstract class GenericStargate {
 
         for (int j = 0; j < DEFAULT_SIDES; j++) {
             Matrix2f m = new Matrix2f(matrix2f);
-            m.rotate((float) Math.toRadians(j * -DEFAULT_ANGLE));
+            m.rotate(j * -DEFAULT_ANGLE * 0.017453292F);
             renderOuterRing(bb, m, j);
             renderInnerRing(bb, m, j);
         }
@@ -147,9 +147,9 @@ public abstract class GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(9.5F - DIVIDER_CENTER * 16, 46 + DIVIDER_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(9.5F + DIVIDER_CENTER * 16, 46 + DIVIDER_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(9.5F - DIVIDER_CENTER * 16, 46 - DIVIDER_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(9.5F - DIVIDER_CENTER * 16, 46 - DIVIDER_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(9.5F - DIVIDER_CENTER * 16, 46 + DIVIDER_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(9.5F + DIVIDER_CENTER * 16, 46 + DIVIDER_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(9.5F + DIVIDER_CENTER * 16, 46 - DIVIDER_HEIGHT / 2 * 16);
 
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
@@ -169,9 +169,9 @@ public abstract class GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(4 - stargateSymbolRingOuterCenter * 16, 46 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(4 + stargateSymbolRingInnerCenter * 16, 46 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(4 - stargateSymbolRingInnerCenter * 16, 46 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(4 - stargateSymbolRingOuterCenter * 16, 46 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(4 - stargateSymbolRingInnerCenter * 16, 46 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(4 + stargateSymbolRingInnerCenter * 16, 46 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(4 + stargateSymbolRingOuterCenter * 16, 46 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
 
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);

@@ -1,6 +1,5 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
+package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import net.neoforged.fml.earlydisplay.RenderElement;
 
