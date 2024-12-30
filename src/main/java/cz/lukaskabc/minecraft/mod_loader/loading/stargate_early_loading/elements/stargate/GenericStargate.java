@@ -103,10 +103,10 @@ public abstract class GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_STOP_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(texBase - STARGATE_RING_STOP_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u4 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(texBase - 5, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(texBase - 5, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(texBase + 5, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u4 = new Vector2f(texBase + 5, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
 
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
