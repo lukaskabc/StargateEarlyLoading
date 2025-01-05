@@ -83,8 +83,10 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         glfwMakeContextCurrent(accessor.getGlWindow());
         recreateContext();
         final List<RenderElement> elements = accessor.getElements();
+        final RenderElement loadingBar = elements.getLast();
         elements.clear();
         elements.addAll(constructElements());
+        elements.add(loadingBar);
         glfwMakeContextCurrent(0);
     }
 

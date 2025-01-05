@@ -65,7 +65,7 @@ public abstract class GenericStargate {
         this.stargateSymbolRingInnerCenter = stargateSymbolRingInnerLength / 2;
     }
 
-    private static void renderInnerRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
+    protected static void renderInnerRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
         final float texBase = 10f * (j % 4) + 5;
 
         Vector2f v1 = new Vector2f(-STARGATE_RING_START_CENTER, STARGATE_RING_START_RADIUS);
@@ -86,16 +86,12 @@ public abstract class GenericStargate {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    private static void renderOuterRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
+    protected static void renderOuterRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
         final float texBase = 10F * (j % 4) + 5;
 
-        // TOP LEFT
         Vector2f v1 = new Vector2f(-STARGATE_RING_OUTER_CENTER, STARGATE_RING_OUTER_RADIUS);
-        // BOTTOM LEFT
         Vector2f v2 = new Vector2f(-STARGATE_RING_STOP_CENTER, STARGATE_RING_STOP_RADIUS);
-        // BOTTOM RIGHT
         Vector2f v3 = new Vector2f(STARGATE_RING_STOP_CENTER, STARGATE_RING_STOP_RADIUS);
-        // TOP RIGHT
         Vector2f v4 = new Vector2f(STARGATE_RING_OUTER_CENTER, STARGATE_RING_OUTER_RADIUS);
 
         matrix2f.transform(v1);
