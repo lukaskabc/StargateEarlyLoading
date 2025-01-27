@@ -1,6 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.SGJourneyModel;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
 import org.joml.Matrix2f;
@@ -8,6 +9,9 @@ import org.joml.Matrix3f;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 
+import java.util.List;
+
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.ASSETS_DIRECTORY;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
 
 public abstract class GenericStargate {
@@ -54,6 +58,9 @@ public abstract class GenericStargate {
     protected final float stargateSymbolRingInnerLength;
     protected final float stargateSymbolRingInnerCenter;
 
+    private int chevronsEngaged = 0;
+    private int chevronsRaised = 0;
+
     protected GenericStargate(short symbolCount) {
         this.symbolCount = symbolCount;
         this.symbolAngle = 360F / symbolCount;
@@ -63,6 +70,29 @@ public abstract class GenericStargate {
 
         this.stargateSymbolRingInnerLength = SGJourneyModel.getUsedWidth(symbolCount, STARGATE_SYMBOL_RING_INNER_HEIGHT, DEFAULT_RADIUS);
         this.stargateSymbolRingInnerCenter = stargateSymbolRingInnerLength / 2;
+    }
+
+    protected List<RenderElement> create(String texture, int size) {
+        return List.of(
+                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/" + texture + ".png", size, getTextureId(), this::render),
+                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/" + texture + "_engaged.png", size, getEngagedTextureId(), this::renderEngaged)
+        );
+    }
+
+    public void engageChevron(int chevron) {
+        chevronsEngaged = chevronsEngaged | (1 << chevron);
+    }
+
+    public boolean isChevronEngaged(int chevron) {
+        return (chevronsEngaged & (1 << chevron)) > 0;
+    }
+
+    public void raiseChevron(int chevron) {
+        chevronsEngaged = chevronsEngaged | (1 << chevron);
+    }
+
+    public boolean isChevronRaised(int chevron) {
+        return (chevronsEngaged & (1 << chevron)) > 0;
     }
 
     protected static void renderInnerRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
@@ -126,7 +156,14 @@ public abstract class GenericStargate {
             renderInnerRing(bb, m, j);
         }
 
-        renderChevrons(bb, matrix2f);
+        renderChevrons(bb, matrix2f, true);
+    }
+
+    public void renderEngaged(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
+        Matrix2f matrix2f = new Matrix2f();
+        matrix2f.scale(SCALE);
+        matrix2f.scale(-1);
+        renderChevrons(bb, matrix2f, false);
     }
 
     protected void renderSymbolDividers(SimpleBufferBuilder bb, Matrix2f m, int j, float rotation) {
@@ -173,24 +210,28 @@ public abstract class GenericStargate {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    private void renderChevrons(SimpleBufferBuilder bb, Matrix2f matrix2f) {
-        // TODO: if engaged
-        renderPrimaryChevron(bb, matrix2f);
+    private void renderChevrons(SimpleBufferBuilder bb, Matrix2f matrix2f, boolean renderInActive) {
+        if (renderInActive || isChevronEngaged(0)) {
+            renderPrimaryChevron(bb, matrix2f);
+        }
         for (int chevron = 1; chevron < NUMBER_OF_CHEVRONS; chevron++) {
-            renderChevron(bb, matrix2f, chevron);
+            if (renderInActive || isChevronEngaged(chevron)) {
+                renderChevron(bb, matrix2f, chevron);
+            }
         }
     }
 
     protected void renderChevron(SimpleBufferBuilder bufferBuilder, Matrix2f matrix2f, int chevron) {
         // 3D matrix required for translation
         Matrix3f matrix3f = new Matrix3f(matrix2f);
-        matrix3f.rotate(new Quaternionf().rotationZ((float) Math.toRadians(-CHEVRON_ANGLE * chevron)));
+        matrix3f.rotate(new Quaternionf().rotationZ((float) Math.toRadians(CHEVRON_ANGLE * chevron)));
 
         // translation
         translate(matrix3f, 0, DEFAULT_RADIUS - (2.5f / 16));
+        final boolean isRaised = isChevronRaised(chevron);
 
-        GenericChevron.renderChevronLight(bufferBuilder, matrix3f, false);
-        GenericChevron.renderOuterChevronFront(bufferBuilder, matrix3f, false);
+        GenericChevron.renderChevronLight(bufferBuilder, matrix3f, isRaised);
+        GenericChevron.renderOuterChevronFront(bufferBuilder, matrix3f, isRaised);
     }
 
     protected void renderSymbols(SimpleBufferBuilder bb) {
@@ -209,8 +250,14 @@ public abstract class GenericStargate {
         // translation
         translate(matrix3f, 0, DEFAULT_RADIUS - (2.5f / 16));
 
-        GenericChevron.renderChevronLight(bb, matrix3f, false);
+        final boolean isRaised = isChevronRaised(0);
+
+        GenericChevron.renderChevronLight(bb, matrix3f, isRaised);
         // if movie chevron
-        GenericChevron.renderOuterChevronFront(bb, matrix3f, false);
+        GenericChevron.renderOuterChevronFront(bb, matrix3f, isRaised);
     }
+
+    protected abstract int getTextureId();
+
+    protected abstract int getEngagedTextureId();
 }

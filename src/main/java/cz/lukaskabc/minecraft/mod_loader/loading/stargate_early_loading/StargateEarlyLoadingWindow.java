@@ -40,7 +40,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final List<RenderElement> elements = new ArrayList<>();
 //        elements.add(DarkSkyBackground.create());
 //        elements.addAll(PegasusRefreshedLoop.create());
-        elements.add(new MilkyWayStargate().create());
+        elements.addAll(new MilkyWayStargate().create());
         return elements;
     }
 

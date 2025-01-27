@@ -31,14 +31,6 @@ public class RefRenderElement extends ReflectionAccessor {
         super(target, RenderElement.class);
     }
 
-    public static RenderElement createTriangular(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
-        try {
-            return constructor(initializeTexture(textureFileName, size, textureNumber, positionAndColour, SimpleBufferBuilder.Mode.TRIANGLES));
-        } catch (NoSuchMethodException e) {
-            throw new ReflectionException(e);
-        }
-    }
-
     public static RenderElement createQuad(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
         try {
             return constructor(initializeTexture(textureFileName, size, textureNumber, positionAndColour, SimpleBufferBuilder.Mode.QUADS));
