@@ -1,0 +1,16 @@
+{
+  "texture": "sgjourney:textures/entity/stargate/milky_way/promo/promo_stargate.png",
+  "engaged_texture": "sgjourney:textures/entity/stargate/milky_way/promo/promo_stargate_engaged.png",
+  "symbols": {
+    "symbol_color": {
+      "red": 0.188,
+      "green": 0.192,
+      "blue": 0.247,
+      "alpha": 1.0
+    }
+  },
+  "stargate_model": {
+    "movie_chevron_locking": true,
+    "movie_primary_chevron": true
+  }
+}

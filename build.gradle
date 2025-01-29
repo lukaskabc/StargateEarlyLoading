@@ -63,6 +63,10 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:${jackson_version}'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:${jackson_version}'
+    implementation 'com.fasterxml.jackson.core:jackson-core:${jackson_version}'
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

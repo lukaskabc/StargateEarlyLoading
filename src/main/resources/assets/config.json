@@ -1,0 +1,10 @@
+{
+  "allowed_variants": {
+    "milky_way": [
+      "default",
+      "movie",
+      "promo",
+      "sg-1"
+    ]
+  }
+}

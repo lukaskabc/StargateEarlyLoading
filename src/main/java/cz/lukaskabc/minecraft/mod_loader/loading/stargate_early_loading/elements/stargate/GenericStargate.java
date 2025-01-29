@@ -146,6 +146,10 @@ public abstract class GenericStargate {
         matrix2f.scale(-1); // rotate 180 degrees
         for (int j = 0; j < symbolCount; j++) {
             renderSymbolRing(bb, matrix2f, j, rotation);
+        }
+
+        // second loop required for depth handling
+        for (int j = 0; j < symbolCount; j++) {
             renderSymbolDividers(bb, matrix2f, j, rotation);
         }
 
@@ -257,7 +261,11 @@ public abstract class GenericStargate {
         GenericChevron.renderOuterChevronFront(bb, matrix3f, isRaised);
     }
 
-    protected abstract int getTextureId();
+    protected int getTextureId() {
+        return 2;
+    }
 
-    protected abstract int getEngagedTextureId();
+    protected int getEngagedTextureId() {
+        return 3;
+    }
 }
