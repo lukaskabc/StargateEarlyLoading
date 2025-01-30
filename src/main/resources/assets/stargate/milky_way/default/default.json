@@ -1,0 +1,12 @@
+{
+  "texture": "stargate/milky_way/default/milky_way_stargate.png",
+  "engaged_texture": "stargate/milky_way/default/milky_way_stargate_engaged.png",
+  "symbols": {
+    "symbol_color": {
+      "red": 0.188,
+      "green": 0.192,
+      "blue": 0.247,
+      "alpha": 1.0
+    }
+  }
+}

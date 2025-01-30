@@ -1,0 +1,27 @@
+{
+  "texture": "pegasus_stargate.png",
+  "engaged_texture": "pegasus_stargate_engaged.png",
+  "symbols": {
+    "symbol_color": {
+      "red": 0.0,
+      "green": 0.392,
+      "blue": 0.784,
+      "alpha": 1.0
+    },
+    "encoded_symbol_color": {
+      "red": 0.0,
+      "green": 0.784,
+      "blue": 1.0,
+      "alpha": 1.0
+    },
+    "engaged_symbol_color": {
+      "red": 0.0,
+      "green": 0.784,
+      "blue": 1.0,
+      "alpha": 1.0
+    },
+    "symbols_glow": true,
+    "encoded_symbols_glow": true,
+    "engaged_symbols_glow": true
+  }
+}

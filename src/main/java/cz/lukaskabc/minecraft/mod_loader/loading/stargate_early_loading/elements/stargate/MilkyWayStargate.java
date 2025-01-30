@@ -11,6 +11,6 @@ public class MilkyWayStargate extends GenericStargate {
     }
 
     public List<RenderElement> create() {
-        return super.create("pegasus/default/milky_way_stargate", 2608);
+        return super.create("milky_way/default/milky_way_stargate", 2608);
     }
 }

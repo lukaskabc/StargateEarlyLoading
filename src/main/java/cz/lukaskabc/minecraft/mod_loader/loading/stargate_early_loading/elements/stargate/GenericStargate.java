@@ -74,8 +74,8 @@ public abstract class GenericStargate {
 
     protected List<RenderElement> create(String texture, int size) {
         return List.of(
-                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/" + texture + ".png", size, getTextureId(), this::render),
-                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/" + texture + "_engaged.png", size, getEngagedTextureId(), this::renderEngaged)
+                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/stargate/" + texture + ".png", size, getTextureId(), this::render),
+                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/stargate/" + texture + "_engaged.png", size, getEngagedTextureId(), this::renderEngaged)
         );
     }
 
