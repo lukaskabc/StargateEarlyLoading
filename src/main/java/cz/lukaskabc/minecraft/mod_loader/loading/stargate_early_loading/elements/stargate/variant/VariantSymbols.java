@@ -1,17 +1,26 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+
+@NullMarked
 public class VariantSymbols {
-    private Color symbolColor;
+    private Color symbolColor = new Color();
+    @Nullable
     private Color encodedSymbolColor;
+    @Nullable
     private Color engagedSymbolColor;
 
+    @Nullable
     private String permanentPointOfOrigin;
+    @Nullable
     private String permanentSymbols;
 
     private boolean symbolsGlow = false;
     private boolean encodedSymbolsGlow = false;
     private boolean engagedSymbolsGlow = false;
-    private boolean engageEncodedSymbols = false;
 
     public Color getSymbolColor() {
         return symbolColor;
@@ -22,6 +31,9 @@ public class VariantSymbols {
     }
 
     public Color getEncodedSymbolColor() {
+        if (encodedSymbolColor == null) {
+            return getEngagedSymbolColor();
+        }
         return encodedSymbolColor;
     }
 
@@ -30,6 +42,9 @@ public class VariantSymbols {
     }
 
     public Color getEngagedSymbolColor() {
+        if (engagedSymbolColor == null) {
+            return getSymbolColor();
+        }
         return engagedSymbolColor;
     }
 
@@ -37,16 +52,16 @@ public class VariantSymbols {
         this.engagedSymbolColor = engagedSymbolColor;
     }
 
-    public String getPermanentPointOfOrigin() {
-        return permanentPointOfOrigin;
+    public Optional<String> getPermanentPointOfOrigin() {
+        return Optional.ofNullable(permanentPointOfOrigin);
     }
 
     public void setPermanentPointOfOrigin(String permanentPointOfOrigin) {
         this.permanentPointOfOrigin = permanentPointOfOrigin;
     }
 
-    public String getPermanentSymbols() {
-        return permanentSymbols;
+    public Optional<String> getPermanentSymbols() {
+        return Optional.ofNullable(permanentSymbols);
     }
 
     public void setPermanentSymbols(String permanentSymbols) {
@@ -75,13 +90,5 @@ public class VariantSymbols {
 
     public void setEngagedSymbolsGlow(boolean engagedSymbolsGlow) {
         this.engagedSymbolsGlow = engagedSymbolsGlow;
-    }
-
-    public boolean isEngageEncodedSymbols() {
-        return engageEncodedSymbols;
-    }
-
-    public void setEngageEncodedSymbols(boolean engageEncodedSymbols) {
-        this.engageEncodedSymbols = engageEncodedSymbols;
     }
 }

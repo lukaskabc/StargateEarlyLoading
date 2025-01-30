@@ -3,6 +3,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.MilkyWayStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -34,6 +35,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     public StargateEarlyLoadingWindow() {
         this.accessor = new RefDisplayWindow(this);
+        ConfigLoader.copyDefaultConfig();
+        Config config = ConfigLoader.loadConfiguration();
     }
 
     private static List<RenderElement> constructElements() {

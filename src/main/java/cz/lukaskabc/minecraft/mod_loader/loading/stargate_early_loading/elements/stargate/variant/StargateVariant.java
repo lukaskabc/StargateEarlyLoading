@@ -1,14 +1,13 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullUnmarked;
 
 /**
  * Structure for JSON binding representing stargate variant
  */
+@NullUnmarked
 public class StargateVariant {
-    public StargateVariant(Type type) {
-        this.type = type;
-    }
 
     public enum Type {
         MILKY_WAY,
@@ -16,15 +15,22 @@ public class StargateVariant {
         UNIVERSE
     }
 
-    @JsonIgnore
-    private final Type type;
+    private Type type;
     private String texture;
     private String engagedTexture;
-    private VariantSymbols symbols;
-    private VariantModel stargateModel;
+    @NonNull
+    private VariantSymbols symbols = new VariantSymbols();
+    @NonNull
+    private VariantModel stargateModel = new VariantModel();
+
+    // region <Getters & Setters>
 
     public Type getType() {
         return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public String getTexture() {
@@ -43,19 +49,22 @@ public class StargateVariant {
         this.engagedTexture = engagedTexture;
     }
 
+    @NonNull
     public VariantSymbols getSymbols() {
         return symbols;
     }
 
-    public void setSymbols(VariantSymbols symbols) {
+    public void setSymbols(@NonNull VariantSymbols symbols) {
         this.symbols = symbols;
     }
 
+    @NonNull
     public VariantModel getStargateModel() {
         return stargateModel;
     }
 
-    public void setStargateModel(VariantModel stargateModel) {
+    public void setStargateModel(@NonNull VariantModel stargateModel) {
         this.stargateModel = stargateModel;
     }
+    // endregion
 }

@@ -1,5 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class VariantModel {
     private boolean movieChevronLocking = false;
     private boolean moviePrimaryChevron = false;

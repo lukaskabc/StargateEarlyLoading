@@ -1,7 +1,20 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant;
 
 public class Color {
-    public float red, green, blue, alpha;
+    private float red = 0f;
+    private float green = 0f;
+    private float blue = 0f;
+    private float alpha = 0f;
+
+    public Color(float red, float green, float blue, float alpha) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
+    }
+
+    public Color() {
+    }
 
     public float getRed() {
         return red;
