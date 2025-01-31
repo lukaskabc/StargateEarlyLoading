@@ -11,5 +11,10 @@ public class MilkyWayStargate extends GenericStargate {
             throw new IllegalArgumentException("Invalid variant type: " + stargateVariant.getType());
         }
         stargateVariant.setType(StargateType.MILKY_WAY);
+
+        raiseChevron(0);
+        raiseChevron(3);
+        engageChevron(1);
+        engageChevron(5);
     }
 }

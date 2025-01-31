@@ -96,11 +96,11 @@ public abstract class GenericStargate {
     }
 
     public void raiseChevron(int chevron) {
-        engagedChevrons = engagedChevrons | (1 << chevron);
+        raisedChevrons = raisedChevrons | (1 << chevron);
     }
 
     public boolean isChevronRaised(int chevron) {
-        return (engagedChevrons & (1 << chevron)) > 0;
+        return (raisedChevrons & (1 << chevron)) > 0;
     }
 
     protected static void renderInnerRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
@@ -263,9 +263,13 @@ public abstract class GenericStargate {
         translate(matrix3f, 0, DEFAULT_RADIUS - (2.5f / 16));
 
         final boolean isRaised = isChevronRaised(0);
+        final boolean isMovieChevron = variant.getStargateModel().isMoviePrimaryChevron();
 
-        GenericChevron.renderChevronLight(bb, matrix3f, isRaised);
-        // if movie chevron
-        GenericChevron.renderOuterChevronFront(bb, matrix3f, isRaised);
+        GenericChevron.renderChevronLight(bb, matrix3f, isRaised && !isMovieChevron);
+        if (isMovieChevron) {
+            MovieChevron.renderMovieChevronFront(bb, matrix3f);
+        } else {
+            GenericChevron.renderOuterChevronFront(bb, matrix3f, isRaised);
+        }
     }
 }

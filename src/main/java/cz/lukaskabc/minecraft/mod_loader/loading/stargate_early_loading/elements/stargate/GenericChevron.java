@@ -128,4 +128,8 @@ public class GenericChevron {
 
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
+
+    private GenericChevron() {
+        throw new AssertionError();
+    }
 }
