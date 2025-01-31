@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.SGJourneyModel;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -11,10 +12,12 @@ import org.joml.Vector2f;
 
 import java.util.List;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.ASSETS_DIRECTORY;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
 
 public abstract class GenericStargate {
+    private static final int STARGATE_TEXTURE_ID = 2;
+    private static final int STARGATE_ENGAGED_TEXTURE_ID = 3;
+    private static final int DEFAULT_TEXTURE_SIZE = 2608;
     public static final float SCALE = 120;
     public static final Vector2f CENTER = new Vector2f(954f / 2, 947f / 2);
     protected static final float DEFAULT_RADIUS = 3.5F;
@@ -57,12 +60,17 @@ public abstract class GenericStargate {
     protected final float stargateSymbolRingOuterCenter;
     protected final float stargateSymbolRingInnerLength;
     protected final float stargateSymbolRingInnerCenter;
+    protected final StargateVariant variant;
 
-    private int chevronsEngaged = 0;
-    private int chevronsRaised = 0;
+    // bitmap
+    private int engagedChevrons = 0;
+    // bitmap
+    private int raisedChevrons = 0;
 
-    protected GenericStargate(short symbolCount) {
+    protected GenericStargate(short symbolCount, StargateVariant variant) {
         this.symbolCount = symbolCount;
+        this.variant = variant;
+
         this.symbolAngle = 360F / symbolCount;
 
         this.stargateSymbolRingOuterLength = SGJourneyModel.getUsedWidth(symbolCount, STARGATE_SYMBOL_RING_OUTER_HEIGHT, DEFAULT_RADIUS);
@@ -72,27 +80,27 @@ public abstract class GenericStargate {
         this.stargateSymbolRingInnerCenter = stargateSymbolRingInnerLength / 2;
     }
 
-    protected List<RenderElement> create(String texture, int size) {
+    public List<RenderElement> createRenderElements() {
         return List.of(
-                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/stargate/" + texture + ".png", size, getTextureId(), this::render),
-                RefRenderElement.createQuad(ASSETS_DIRECTORY + "/stargate/" + texture + "_engaged.png", size, getEngagedTextureId(), this::renderEngaged)
+                RefRenderElement.createQuad(variant.getTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_TEXTURE_ID, this::render),
+                RefRenderElement.createQuad(variant.getEngagedTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_ENGAGED_TEXTURE_ID, this::renderEngaged)
         );
     }
 
     public void engageChevron(int chevron) {
-        chevronsEngaged = chevronsEngaged | (1 << chevron);
+        engagedChevrons = engagedChevrons | (1 << chevron);
     }
 
     public boolean isChevronEngaged(int chevron) {
-        return (chevronsEngaged & (1 << chevron)) > 0;
+        return (engagedChevrons & (1 << chevron)) > 0;
     }
 
     public void raiseChevron(int chevron) {
-        chevronsEngaged = chevronsEngaged | (1 << chevron);
+        engagedChevrons = engagedChevrons | (1 << chevron);
     }
 
     public boolean isChevronRaised(int chevron) {
-        return (chevronsEngaged & (1 << chevron)) > 0;
+        return (engagedChevrons & (1 << chevron)) > 0;
     }
 
     protected static void renderInnerRing(final SimpleBufferBuilder bb, final Matrix2f matrix2f, final int j) {
@@ -259,13 +267,5 @@ public abstract class GenericStargate {
         GenericChevron.renderChevronLight(bb, matrix3f, isRaised);
         // if movie chevron
         GenericChevron.renderOuterChevronFront(bb, matrix3f, isRaised);
-    }
-
-    protected int getTextureId() {
-        return 2;
-    }
-
-    protected int getEngagedTextureId() {
-        return 3;
     }
 }

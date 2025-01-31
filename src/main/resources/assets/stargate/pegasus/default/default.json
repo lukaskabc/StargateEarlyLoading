@@ -1,6 +1,6 @@
 {
-  "texture": "pegasus_stargate.png",
-  "engaged_texture": "pegasus_stargate_engaged.png",
+  "texture": "/assets/stargate/pegasus/pegasus_stargate.png",
+  "engaged_texture": "/assets/stargate/pegasus/pegasus_stargate_engaged.png",
   "symbols": {
     "symbol_color": {
       "red": 0.0,

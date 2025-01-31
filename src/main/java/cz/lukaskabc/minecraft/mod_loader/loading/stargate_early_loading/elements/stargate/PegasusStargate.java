@@ -3,13 +3,12 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.element
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateType;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
 
-public class MilkyWayStargate extends GenericStargate {
-
-    public MilkyWayStargate(StargateVariant stargateVariant) {
-        super((short) 39, stargateVariant);
-        if (stargateVariant.getType() != null && stargateVariant.getType() != StargateType.MILKY_WAY) {
+public class PegasusStargate extends GenericStargate {
+    public PegasusStargate(StargateVariant stargateVariant) {
+        super((short) 36, stargateVariant);
+        if (stargateVariant.getType() != null && stargateVariant.getType() != StargateType.PEGASUS) {
             throw new IllegalArgumentException("Invalid variant type: " + stargateVariant.getType());
         }
-        stargateVariant.setType(StargateType.MILKY_WAY);
+        stargateVariant.setType(StargateType.PEGASUS);
     }
 }

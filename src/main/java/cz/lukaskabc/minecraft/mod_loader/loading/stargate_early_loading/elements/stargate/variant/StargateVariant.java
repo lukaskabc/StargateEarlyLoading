@@ -9,13 +9,7 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class StargateVariant {
 
-    public enum Type {
-        MILKY_WAY,
-        PEGASUS,
-        UNIVERSE
-    }
-
-    private Type type;
+    private StargateType type;
     private String texture;
     private String engagedTexture;
     @NonNull
@@ -25,11 +19,11 @@ public class StargateVariant {
 
     // region <Getters & Setters>
 
-    public Type getType() {
+    public StargateType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(StargateType type) {
         this.type = type;
     }
 

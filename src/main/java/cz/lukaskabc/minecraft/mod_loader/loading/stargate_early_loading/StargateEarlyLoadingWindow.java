@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.MilkyWayStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
@@ -32,20 +32,24 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private static final Logger LOG = LogManager.getLogger();
     public static int globalAlpha = 255;
     private final RefDisplayWindow accessor;
+    private final Config configuration;
+    private final GenericStargate stargate;
 
     public StargateEarlyLoadingWindow() {
         this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();
-        Config config = ConfigLoader.loadConfiguration();
+        configuration = ConfigLoader.loadConfiguration();
+        stargate = ConfigLoader.loadStargate(configuration);
     }
 
-    private static List<RenderElement> constructElements() {
+    private List<RenderElement> constructElements() {
         final List<RenderElement> elements = new ArrayList<>();
 //        elements.add(DarkSkyBackground.create());
 //        elements.addAll(PegasusRefreshedLoop.create());
-        elements.addAll(new MilkyWayStargate().create());
+        elements.addAll(stargate.createRenderElements());
         return elements;
     }
+
 
     @Override
     public String name() {
@@ -57,6 +61,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final Runnable result = super.initialize(arguments);
         // force black colour scheme
         accessor.setColourScheme(ColourScheme.BLACK);
+
         return result;
     }
 

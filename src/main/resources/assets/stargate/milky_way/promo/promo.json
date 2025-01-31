@@ -1,6 +1,6 @@
 {
-  "texture": "stargate/milky_way/default/milky_way_stargate.png",
-  "engaged_texture": "stargate/milky_way/default/milky_way_stargate_engaged.png",
+  "texture": "/assets/stargate/milky_way/default/milky_way_stargate.png",
+  "engaged_texture": "/assets/stargate/milky_way/default/milky_way_stargate_engaged.png",
   "symbols": {
     "symbol_color": {
       "red": 0.188,
