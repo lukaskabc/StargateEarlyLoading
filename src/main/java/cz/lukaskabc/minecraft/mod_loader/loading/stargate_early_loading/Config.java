@@ -1,12 +1,15 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import java.util.Map;
+
 public class Config {
-    private AllowedVariants allowedVariants;
+    private AllowedVariants variants = new AllowedVariants();
+    private Map<String, Symbols> symbols = Map.of();
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
         private String[] pegasus = new String[0];
-        private String[] Universe = new String[0];
+        private String[] universe = new String[0];
 
         // region <Getters & Setters>
         public String[] getMilkyWay() {
@@ -26,20 +29,36 @@ public class Config {
         }
 
         public String[] getUniverse() {
-            return Universe;
+            return universe;
         }
 
         public void setUniverse(String[] universe) {
-            Universe = universe;
+            this.universe = universe;
         }
         // endregion
     }
 
-    public AllowedVariants getAllowedVariants() {
-        return allowedVariants;
+    public record Symbols(int size, String file) {
+        public float getTextureOffset(int symbol) {
+            symbol -= 1;
+            float symbolSize = 1F / size;
+            return symbolSize * symbol + symbolSize / 2F;
+        }
     }
 
-    public void setAllowedVariants(AllowedVariants allowedVariants) {
-        this.allowedVariants = allowedVariants;
+    public AllowedVariants getVariants() {
+        return variants;
+    }
+
+    public void setVariants(AllowedVariants variants) {
+        this.variants = variants;
+    }
+
+    public Map<String, Symbols> getSymbols() {
+        return symbols;
+    }
+
+    public void setSymbols(Map<String, Symbols> symbols) {
+        this.symbols = symbols;
     }
 }

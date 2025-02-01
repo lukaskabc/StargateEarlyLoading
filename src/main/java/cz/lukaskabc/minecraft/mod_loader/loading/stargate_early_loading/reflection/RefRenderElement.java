@@ -16,6 +16,7 @@ public class RefRenderElement extends ReflectionAccessor {
     public static final Class<?> RENDERER_CLASS;
     public static final Class<?> INITIALIZER_CLASS;
     public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
+    public static int INDEX_TEXTURE_OFFSET = 0;
 
     static {
         try {
@@ -63,7 +64,7 @@ public class RefRenderElement extends ReflectionAccessor {
     }
 
     private static Object createInternalRenderer(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour, SimpleBufferBuilder.Mode bufferMode) {
-        final int INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET") + LOADING_INDEX_TEXTURE_OFFSET;
+        INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET") + LOADING_INDEX_TEXTURE_OFFSET;
         final int[] imgSize = STBHelper.loadTextureFromClasspath(textureFileName, size, GL_TEXTURE0 + textureNumber + INDEX_TEXTURE_OFFSET);
         return Proxy.newProxyInstance(RENDERER_CLASS.getClassLoader(),
                 new Class[]{RENDERER_CLASS},

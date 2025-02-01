@@ -16,6 +16,14 @@ public class Color {
     public Color() {
     }
 
+    private int norm(float f) {
+        return (int) (f * 255);
+    }
+
+    public int packedColor() {
+        return ((norm(alpha) & 0xff) << 24) | ((norm(blue) & 0xff) << 16) | ((norm(green) & 0xff) << 8) | (norm(red) & 0xff);
+    }
+
     public float getRed() {
         return red;
     }

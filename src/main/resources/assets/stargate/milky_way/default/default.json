@@ -7,6 +7,8 @@
       "green": 0.192,
       "blue": 0.247,
       "alpha": 1.0
-    }
+    },
+    "permanent_symbols": "milky_way:terra",
+    "permanent_point_of_origin": "/assets/symbols/milky_way/tauri_origin.png"
   }
 }

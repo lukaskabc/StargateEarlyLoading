@@ -63,7 +63,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
-
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

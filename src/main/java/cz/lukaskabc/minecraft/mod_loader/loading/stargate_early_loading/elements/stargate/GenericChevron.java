@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate;
 
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -49,7 +49,7 @@ public class GenericChevron {
     protected static final float OUTER_CHEVRON_UPPER_BOTTOM_CENTER = (OUTER_CHEVRON_TOP_OFFSET / (OUTER_CHEVRON_SIDE_HEIGHT + OUTER_CHEVRON_BOTTOM_HEIGHT)) * OUTER_CHEVRON_BOTTOM_HEIGHT;
 
 
-    public static void renderChevronLight(SimpleBufferBuilder bb, Matrix3f matrix3f, boolean isRaised) {
+    public static void renderChevronLight(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised) {
         float yOffset = isRaised ? 2F / 16 : 0;
         Vector3f v1 = new Vector3f(-CHEVRON_LIGHT_TOP_CENTER, CHEVRON_LIGHT_HEIGHT_CENTER + yOffset, CHEVRON_LIGHT_FRONT_Z_OFFSET);
         Vector2f u1 = new Vector2f(48f, 17f);
@@ -68,14 +68,14 @@ public class GenericChevron {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    public static void renderOuterChevronFront(SimpleBufferBuilder bb, Matrix3f matrix3f, boolean isRaised) {
+    public static void renderOuterChevronFront(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised) {
         float yOffset = isRaised ? -2F / 16 : 0;
         renderCenterOuterChevron(bb, matrix3f, isRaised, yOffset);
         renderLeftOuterChevron(bb, matrix3f, isRaised, yOffset);
         renderRightOuterChevron(bb, matrix3f, isRaised, yOffset);
     }
 
-    private static void renderRightOuterChevron(SimpleBufferBuilder bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
+    private static void renderRightOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
         Vector3f v1 = new Vector3f(OUTER_CHEVRON_TOP_OFFSET, OUTER_CHEVRON_BOTTOM_HEIGHT_CENTER + OUTER_CHEVRON_SIDE_HEIGHT + OUTER_CHEVRON_Y_OFFSET + yOffset, OUTER_CHEVRON_Z_OFFSET);
         Vector2f u1 = new Vector2f(60F, 36F);
         Vector3f v2 = new Vector3f(0F / 16, -OUTER_CHEVRON_BOTTOM_HEIGHT_CENTER + OUTER_CHEVRON_Y_OFFSET + yOffset, OUTER_CHEVRON_Z_OFFSET);
@@ -93,7 +93,7 @@ public class GenericChevron {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    private static void renderLeftOuterChevron(SimpleBufferBuilder bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
+    private static void renderLeftOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
         Vector3f v1 = new Vector3f(-(OUTER_CHEVRON_TOP_OFFSET + OUTER_CHEVRON_SIDE_TOP_THICKNESS), OUTER_CHEVRON_BOTTOM_HEIGHT_CENTER + OUTER_CHEVRON_SIDE_HEIGHT + OUTER_CHEVRON_Y_OFFSET + yOffset, OUTER_CHEVRON_Z_OFFSET);
         Vector2f u1 = new Vector2f(47F, 36F);
         Vector3f v2 = new Vector3f(-OUTER_CHEVRON_SIDE_BOTTOM_THICKNESS, -OUTER_CHEVRON_BOTTOM_HEIGHT_CENTER + OUTER_CHEVRON_Y_OFFSET + yOffset, OUTER_CHEVRON_Z_OFFSET);
@@ -111,7 +111,7 @@ public class GenericChevron {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
-    private static void renderCenterOuterChevron(SimpleBufferBuilder bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
+    private static void renderCenterOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
         Vector3f v1 = new Vector3f(-OUTER_CHEVRON_UPPER_BOTTOM_CENTER, OUTER_CHEVRON_BOTTOM_HEIGHT_CENTER + OUTER_CHEVRON_Y_OFFSET + yOffset, OUTER_CHEVRON_Z_OFFSET);
         Vector2f u1 = new Vector2f((55F - OUTER_CHEVRON_SIDE_BOTTOM_THICKNESS * 16), 43F);
         Vector3f v2 = new Vector3f(0, -OUTER_CHEVRON_BOTTOM_HEIGHT_CENTER + OUTER_CHEVRON_Y_OFFSET + yOffset, OUTER_CHEVRON_Z_OFFSET);

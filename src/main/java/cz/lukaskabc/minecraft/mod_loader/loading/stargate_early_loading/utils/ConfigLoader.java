@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigLoader {
-    private static final String STARGATE_VARIANT_CONFIG_DIRECTORY = "stargate-early-loading-variants";
+    private static final String STARGATE_VARIANT_CONFIG_DIRECTORY = "stargate-early-loading";
     private static final String DEFAULT_CONFIG_FILE = "/default_config.json";
     private static final String CONFIG_FILE_NAME = "stargate-early-loading.json";
     private static final String RESOURCE_STARGATE_VARIANT_DIRECTORY = "/assets/stargate";
@@ -32,7 +32,7 @@ public class ConfigLoader {
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    private static Path getVariantConfigDirectory() {
+    private static Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get().resolve(STARGATE_VARIANT_CONFIG_DIRECTORY);
     }
 
@@ -76,7 +76,7 @@ public class ConfigLoader {
 
     public static StargateType[] findAvailableTypes(Config configuration) {
         List<StargateType> types = new ArrayList<>(StargateType.values().length);
-        final Config.AllowedVariants allowedVariants = configuration.getAllowedVariants();
+        final Config.AllowedVariants allowedVariants = configuration.getVariants();
         if (allowedVariants.getMilkyWay().length > 0) {
             types.add(StargateType.MILKY_WAY);
         }
@@ -98,31 +98,32 @@ public class ConfigLoader {
     public static GenericStargate loadStargate(Config configuration) {
         final StargateType type = Helper.randomElement(findAvailableTypes(configuration));
         final String[] variants = switch (type) {
-            case MILKY_WAY -> configuration.getAllowedVariants().getMilkyWay();
-            case PEGASUS -> configuration.getAllowedVariants().getPegasus();
-            case UNIVERSE -> configuration.getAllowedVariants().getUniverse();
+            case MILKY_WAY -> configuration.getVariants().getMilkyWay();
+            case PEGASUS -> configuration.getVariants().getPegasus();
+            case UNIVERSE -> configuration.getVariants().getUniverse();
         };
         final String variant = Helper.randomElement(variants);
         final StargateVariant stargateVariant = loadStargateVariant(type, variant);
+        final Config.Symbols symbols = configuration.getSymbols().get(stargateVariant.getSymbols().getPermanentSymbols().orElseThrow(() -> new InitializationException("Stargate variant is missing permanent symbols")));
 
         LOG.atDebug().log("Randomly picked Stargate type: {}, variant: {}", type, variant);
         return switch (type) {
-            case MILKY_WAY -> new MilkyWayStargate(stargateVariant);
-            case PEGASUS -> new PegasusStargate(stargateVariant);
-            case UNIVERSE -> new UniverseStargate(stargateVariant);
+            case MILKY_WAY -> new MilkyWayStargate(stargateVariant, symbols);
+            case PEGASUS -> new PegasusStargate(stargateVariant, symbols);
+            case UNIVERSE -> new UniverseStargate(stargateVariant, symbols);
         };
     }
 
     /**
-     * Tries to resolve file inside {@link #getVariantConfigDirectory()} otherwise resolves file from resources on classpath
+     * Tries to resolve file inside {@link #getConfigDirectory()} otherwise resolves file from resources on classpath
      */
     public static Reader resolveFile(Path path) throws FileNotFoundException {
-        final Path configDir = getVariantConfigDirectory().resolve(path);
+        final Path configDir = getConfigDirectory().resolve(path);
         if (Files.exists(configDir)) {
             return new FileReader(configDir.toFile());
         }
 
-        final InputStream result = ConfigLoader.class.getResourceAsStream("/assets/stargate/" + path.toString().replace('\\', '/'));
+        final InputStream result = ConfigLoader.class.getResourceAsStream("/assets/" + path.toString().replace('\\', '/'));
         if (result == null) {
             throw new FileNotFoundException(configDir.toString());
         }
@@ -130,7 +131,7 @@ public class ConfigLoader {
     }
 
     public static StargateVariant loadStargateVariant(StargateType type, String variant) {
-        final Path path = Path.of(type.name().toLowerCase(), variant);
+        final Path path = Path.of("stargate", type.name().toLowerCase(), variant);
         final Path configPath = path.resolve(variant + ".json");
 
         try {
