@@ -46,7 +46,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final List<RenderElement> elements = new ArrayList<>();
 //        elements.add(DarkSkyBackground.create());
 //        elements.addAll(PegasusRefreshedLoop.create());
-        elements.addAll(stargate.createRenderElements());
+        elements.add(stargate.createRenderElement());
         return elements;
     }
 
@@ -138,5 +138,10 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     public void close() {
         super.close();
         throw new RuntimeException("Loading completed");
+    }
+
+    @Override
+    public void addMojangTexture(int textureId) {
+        // do nothing // TODO: is it ok to do this? like ok with license and stuff
     }
 }

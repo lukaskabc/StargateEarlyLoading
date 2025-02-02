@@ -1,6 +1,6 @@
 {
-  "texture": "/assets/stargate/milky_way/default/milky_way_stargate.png",
-  "engaged_texture": "/assets/stargate/milky_way/default/milky_way_stargate_engaged.png",
+  "texture": "assets/stargate/milky_way/default/milky_way_stargate.png",
+  "engaged_texture": "assets/stargate/milky_way/default/milky_way_stargate_engaged.png",
   "symbols": {
     "symbol_color": {
       "red": 0.188,
@@ -9,6 +9,6 @@
       "alpha": 1.0
     },
     "permanent_symbols": "milky_way:terra",
-    "permanent_point_of_origin": "/assets/symbols/milky_way/tauri_origin.png"
+    "permanent_point_of_origin": "assets/symbols/milky_way/tauri_origin.png"
   }
 }

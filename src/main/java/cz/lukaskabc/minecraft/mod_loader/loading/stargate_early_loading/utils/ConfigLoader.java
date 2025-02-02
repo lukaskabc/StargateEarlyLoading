@@ -26,13 +26,12 @@ public class ConfigLoader {
     private static final String STARGATE_VARIANT_CONFIG_DIRECTORY = "stargate-early-loading";
     private static final String DEFAULT_CONFIG_FILE = "/default_config.json";
     private static final String CONFIG_FILE_NAME = "stargate-early-loading.json";
-    private static final String RESOURCE_STARGATE_VARIANT_DIRECTORY = "/assets/stargate";
     private static final Logger LOG = LogManager.getLogger();
 
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    private static Path getConfigDirectory() {
+    public static Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get().resolve(STARGATE_VARIANT_CONFIG_DIRECTORY);
     }
 
@@ -117,25 +116,29 @@ public class ConfigLoader {
     /**
      * Tries to resolve file inside {@link #getConfigDirectory()} otherwise resolves file from resources on classpath
      */
-    public static Reader resolveFile(Path path) throws FileNotFoundException {
+    public static InputStream resolveFile(Path path) throws FileNotFoundException {
+        if (path.startsWith("/")) {
+            path = path.subpath(1, path.getNameCount());
+        }
         final Path configDir = getConfigDirectory().resolve(path);
         if (Files.exists(configDir)) {
-            return new FileReader(configDir.toFile());
+            return new FileInputStream(configDir.toFile());
         }
 
-        final InputStream result = ConfigLoader.class.getResourceAsStream("/assets/" + path.toString().replace('\\', '/'));
+        String classPath = "/" + path.toString().replace('\\', '/');
+        final InputStream result = ConfigLoader.class.getResourceAsStream(classPath);
         if (result == null) {
             throw new FileNotFoundException(configDir.toString());
         }
-        return new InputStreamReader(result);
+        return result;
     }
 
     public static StargateVariant loadStargateVariant(StargateType type, String variant) {
-        final Path path = Path.of("stargate", type.name().toLowerCase(), variant);
+        final Path path = Path.of("assets", "stargate", type.name().toLowerCase(), variant);
         final Path configPath = path.resolve(variant + ".json");
 
         try {
-            return GSON.fromJson(resolveFile(configPath), StargateVariant.class);
+            return GSON.fromJson(new InputStreamReader(resolveFile(configPath)), StargateVariant.class);
         } catch (JsonParseException | FileNotFoundException e) {
             LOG.atError().log("Failed to load stargate variant:{}", e.getMessage());
             throw new InitializationException(e);

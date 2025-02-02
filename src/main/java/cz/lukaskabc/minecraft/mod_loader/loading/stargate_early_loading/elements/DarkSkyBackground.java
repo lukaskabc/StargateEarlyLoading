@@ -1,19 +1,17 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import net.neoforged.fml.earlydisplay.QuadHelper;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.ASSETS_DIRECTORY;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.globalAlpha;
 
 public class DarkSkyBackground {
     private static final String TEXTURE = "dark_sky.png";
 
-    public static RenderElement create() {
-        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/" + TEXTURE, 34881, 1, DarkSkyBackground::render);
-    }
+//    public static RenderElement create() {
+//        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/" + TEXTURE, 34881, 1, DarkSkyBackground::render);
+//    }
 
     private static void render(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
         float widthScale = (float) ctx.width() / imgSize[0];

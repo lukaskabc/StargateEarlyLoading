@@ -1,13 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import net.neoforged.fml.earlydisplay.QuadHelper;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
-
-import java.util.List;
-
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.ASSETS_DIRECTORY;
 
 public class PegasusRefreshedLoop {
     private static final int SYMBOL_SIZE = 16;
@@ -29,20 +24,20 @@ public class PegasusRefreshedLoop {
     private static float targetY = 0;
     private static float scale = 1;
 
-    public static List<RenderElement> create() {
-        return List.of(
-                staticGate(),
-                symbolAnimation()
-        );
-    }
+//    public static List<RenderElement> create() {
+//        return List.of(
+//                staticGate(),
+//                symbolAnimation()
+//        );
+//    }
 
-    public static RenderElement staticGate() {
-        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/pegasus_refreshed/base.png", 69182, 2, PegasusRefreshedLoop::renderStaticGate);
-    }
-
-    public static RenderElement symbolAnimation() {
-        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/pegasus_refreshed/lantea.png", 2057, 3, PegasusRefreshedLoop::renderSymbolAnimation);
-    }
+//    public static RenderElement staticGate() {
+//        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/pegasus_refreshed/base.png", 69182, 2, PegasusRefreshedLoop::renderStaticGate);
+//    }
+//
+//    public static RenderElement symbolAnimation() {
+//        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/gates/pegasus_refreshed/lantea.png", 2057, 3, PegasusRefreshedLoop::renderSymbolAnimation);
+//    }
 
     public static void renderSymbolAnimation(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
         int symbolId = (frame) % SYMBOL_COUNT;

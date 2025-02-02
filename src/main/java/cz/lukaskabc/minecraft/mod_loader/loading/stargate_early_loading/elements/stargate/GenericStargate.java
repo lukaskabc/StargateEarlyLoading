@@ -4,19 +4,23 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.SGJourneyModel;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
+import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import org.jline.utils.Log;
 import org.joml.Matrix2f;
 import org.joml.Matrix3f;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 
-import java.util.List;
+import java.io.FileNotFoundException;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 public abstract class GenericStargate {
     private static final int STARGATE_TEXTURE_ID = 2;
@@ -25,7 +29,7 @@ public abstract class GenericStargate {
     private static final int STARGATE_POO_SYMBOL_TEXTURE_ID = 5;
     private static final int DEFAULT_TEXTURE_SIZE = 2608;
     public static final float SCALE = 120;
-    public static final Vector2f CENTER = new Vector2f(954f / 2, 947f / 2);
+    public static final Vector2f CENTER = new Vector2f(954f, 947f / 2);
     protected static final float DEFAULT_RADIUS = 3.5F;
     protected static final int DEFAULT_SIDES = 36;
     protected static final float DEFAULT_RING_HEIGHT = 1F;
@@ -88,15 +92,24 @@ public abstract class GenericStargate {
         this.stargateSymbolRingInnerCenter = stargateSymbolRingInnerLength / 2;
     }
 
-    public List<RenderElement> createRenderElements() {
-        return List.of(
-                RefRenderElement.createQuad(variant.getTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_TEXTURE_ID, this::render),
-                // TODO: make something better than this, probably do the initialization manually
-                // also note that we need to try to load the texture from the config directory first and then eventually from classpath
-                RefRenderElement.createQuad(variant.getEngagedTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_ENGAGED_TEXTURE_ID, this::doNothing),
-                RefRenderElement.createQuad(symbols.file(), DEFAULT_TEXTURE_SIZE, STARGATE_SYMBOLS_TEXTURE_ID, this::doNothing),
-                RefRenderElement.createQuad(variant.getSymbols().getPermanentPointOfOrigin().orElseThrow(() -> new InitializationException("No permanent Point Of Origin defined!")), DEFAULT_TEXTURE_SIZE, STARGATE_POO_SYMBOL_TEXTURE_ID, this::doNothing)
-        );
+    public RenderElement createRenderElement() {
+        // texture initialization
+        final String pointOfOrigin = variant.getSymbols().getPermanentPointOfOrigin().orElseThrow(() -> new InitializationException("No permanent Point Of Origin defined!"));
+        final int textureOffset = GL_TEXTURE0 + INDEX_TEXTURE_OFFSET;
+        try {
+            // stargate texture
+            STBHelper.resolveAndBindTexture(variant.getTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_TEXTURE_ID + textureOffset);
+            // stargate engaged texture
+            STBHelper.resolveAndBindTexture(variant.getEngagedTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_ENGAGED_TEXTURE_ID + textureOffset);
+            // symbols texture
+            STBHelper.resolveAndBindTexture(symbols.file(), DEFAULT_TEXTURE_SIZE, STARGATE_SYMBOLS_TEXTURE_ID + textureOffset);
+            // Point of Origin texture
+            STBHelper.resolveAndBindTexture(pointOfOrigin, DEFAULT_TEXTURE_SIZE, STARGATE_POO_SYMBOL_TEXTURE_ID + textureOffset);
+        } catch (FileNotFoundException e) {
+            Log.error("Failed to load texture: ", e.getMessage());
+            throw new InitializationException(e);
+        }
+        return RefRenderElement.constructor(this::render);
     }
 
     public void engageChevron(int chevron) {
@@ -157,35 +170,39 @@ public abstract class GenericStargate {
         renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
     }
 
+    private void initRender(ContextSimpleBuffer contextSimpleBuffer) {
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(STARGATE_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
+        contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
+    }
 
-    public void render(SimpleBufferBuilder simpleBufferBuilder, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
+
+    public void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
+        initRender(contextSimpleBuffer);
         final float rotation = ((frame / 5f) % 360) / 156f * 360F;
-        final ContextSimpleBuffer bb = new ContextSimpleBuffer(simpleBufferBuilder, ctx);
 
         Matrix2f matrix2f = new Matrix2f();
         matrix2f.scale(SCALE);
         matrix2f.scale(-1); // rotate 180 degrees
 
         for (int symbol = 0; symbol < symbolCount; symbol++) {
-            renderSymbolRingSegment(bb, matrix2f, symbol, rotation);
+            renderSymbolRingSegment(contextSimpleBuffer, matrix2f, symbol, rotation);
         }
 
         // second loop required for depth handling
         for (int symbol = 0; symbol < symbolCount; symbol++) {
-            renderSymbolDivider(bb, matrix2f, symbol, rotation);
+            renderSymbolDivider(contextSimpleBuffer, matrix2f, symbol, rotation);
         }
 
         for (int j = 0; j < DEFAULT_SIDES; j++) {
             Matrix2f m = new Matrix2f(matrix2f);
             m.rotate(j * -DEFAULT_ANGLE * 0.017453292F);
-            renderOuterRing(bb, m, j);
-            renderInnerRing(bb, m, j);
+            renderOuterRing(contextSimpleBuffer, m, j);
+            renderInnerRing(contextSimpleBuffer, m, j);
         }
 
-        renderChevrons(bb, matrix2f);
-    }
-
-    public void doNothing(SimpleBufferBuilder simpleBufferBuilder, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
+        renderChevrons(contextSimpleBuffer, matrix2f);
+        contextSimpleBuffer.simpleBufferBuilder().draw();
     }
 
     protected void renderSymbolDivider(ContextSimpleBuffer bb, Matrix2f m, int j, float rotation) {
@@ -291,12 +308,19 @@ public abstract class GenericStargate {
 
     protected void renderSingleSymbol(ContextSimpleBuffer bb, Matrix2f matrix2f, float symbolOffset, int textureXSize) {
         // TODO: symbol scale down - keep it or leave it
+        /*
         final float x = 0.09f * (stargateSymbolRingOuterCenter - stargateSymbolRingInnerCenter);
         final float y = 0.09f * (STARGATE_SYMBOL_RING_OUTER_HEIGHT - STARGATE_SYMBOL_RING_INNER_HEIGHT);
         Vector2f v1 = new Vector2f(-stargateSymbolRingOuterCenter + x, STARGATE_SYMBOL_RING_OUTER_HEIGHT - y);
         Vector2f v2 = new Vector2f(-stargateSymbolRingInnerCenter + x, STARGATE_SYMBOL_RING_INNER_HEIGHT + y);
         Vector2f v3 = new Vector2f(stargateSymbolRingInnerCenter - x, STARGATE_SYMBOL_RING_INNER_HEIGHT + y);
         Vector2f v4 = new Vector2f(stargateSymbolRingOuterCenter - x, STARGATE_SYMBOL_RING_OUTER_HEIGHT - y);
+         */
+
+        Vector2f v1 = new Vector2f(-stargateSymbolRingOuterCenter, STARGATE_SYMBOL_RING_OUTER_HEIGHT);
+        Vector2f v2 = new Vector2f(-stargateSymbolRingInnerCenter, STARGATE_SYMBOL_RING_INNER_HEIGHT);
+        Vector2f v3 = new Vector2f(stargateSymbolRingInnerCenter, STARGATE_SYMBOL_RING_INNER_HEIGHT);
+        Vector2f v4 = new Vector2f(stargateSymbolRingOuterCenter, STARGATE_SYMBOL_RING_OUTER_HEIGHT);
 
         matrix2f.transform(v1);
         matrix2f.transform(v2);
