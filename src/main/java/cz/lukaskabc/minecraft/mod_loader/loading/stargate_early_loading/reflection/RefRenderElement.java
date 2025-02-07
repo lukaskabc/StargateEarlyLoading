@@ -3,7 +3,6 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflect
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
-import sun.reflect.ReflectionFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -14,8 +13,7 @@ public class RefRenderElement extends ReflectionAccessor {
     public static final Class<?> RENDERER_CLASS;
     public static final Class<?> INITIALIZER_CLASS;
     public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
-    public static int INDEX_TEXTURE_OFFSET;
-    private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
+    public static final int INDEX_TEXTURE_OFFSET;
 
     static {
         try {
@@ -31,14 +29,6 @@ public class RefRenderElement extends ReflectionAccessor {
     public RefRenderElement(RenderElement target) {
         super(target, RenderElement.class);
     }
-/*
-    public static RenderElement createQuad(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour) {
-        try {
-            return constructor(initializeTexture(textureFileName, size, textureNumber, positionAndColour, SimpleBufferBuilder.Mode.QUADS));
-        } catch (NoSuchMethodException e) {
-            throw new ReflectionException(e);
-        }
-    }*/
 
 
     private static RenderElement constructor(final Supplier<?> rendererInitializer) {
@@ -66,7 +56,6 @@ public class RefRenderElement extends ReflectionAccessor {
         return constructor(proxyInitializer(renderer));
     }
 
-    @SuppressWarnings("unchecked")
     public static Supplier<?> proxyInitializer(TextureRenderer textureRenderer) {
         return (Supplier<?>) Proxy.newProxyInstance(INITIALIZER_CLASS.getClassLoader(),
                 new Class[]{INITIALIZER_CLASS},
@@ -98,51 +87,6 @@ public class RefRenderElement extends ReflectionAccessor {
                     return renderMethod.invoke(renderProxy, renderArgs);
                 });
     }
-/*
-    private static Object createInternalRenderer(final String textureFileName, int size, int textureNumber, TextureRenderer positionAndColour, SimpleBufferBuilder.Mode bufferMode) {
-        INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET") + LOADING_INDEX_TEXTURE_OFFSET;
-        final int[] imgSize = STBHelper.loadTextureFromClasspath(textureFileName, size, GL_TEXTURE0 + textureNumber + INDEX_TEXTURE_OFFSET);
-        return Proxy.newProxyInstance(RENDERER_CLASS.getClassLoader(),
-                new Class[]{RENDERER_CLASS},
-                (renderProxy, renderMethod, renderArgs) -> {
-                    if (renderMethod.getName().equals("accept")) {
-
-                        final SimpleBufferBuilder bb = (SimpleBufferBuilder) renderArgs[0];
-                        final RenderElement.DisplayContext ctx = (RenderElement.DisplayContext) renderArgs[1];
-                        final int frame = (int) renderArgs[2];
-                        // from RenderElement#Initializer
-                        ctx.elementShader().updateTextureUniform(textureNumber + INDEX_TEXTURE_OFFSET);
-                        ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
-                        bb.begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, bufferMode);
-                        positionAndColour.accept(bb, ctx, imgSize, frame);
-                        bb.draw();
-                        return null;
-                    }
-                    if (!renderMethod.canAccess(renderProxy)) {
-                        renderMethod.setAccessible(true);
-                    }
-                    return renderMethod.invoke(renderProxy, renderArgs);
-                });
-    }*/
-
-//    private static Object proxyTextureRenderer(TextureRenderer textureRenderer) {
-//        return Proxy.newProxyInstance(TEXTURE_RENDERER_CLASS.getClassLoader(),
-//                new Class[]{TEXTURE_RENDERER_CLASS},
-//                (proxy, method, args) -> {
-//                    if (method.getName().equals("accept")) {
-//                        final SimpleBufferBuilder bb = (SimpleBufferBuilder) args[0];
-//                        final RenderElement.DisplayContext ctx = (RenderElement.DisplayContext) args[1];
-//                        final int[] size = (int[]) args[2];
-//                        final int frame = (int) args[3];
-//                        textureRenderer.accept(new ContextSimpleBuffer(bb, ctx), frame);
-//                        return null;
-//                    }
-//                    if (!method.canAccess(proxy)) {
-//                        method.setAccessible(true);
-//                    }
-//                    return method.invoke(proxy, args);
-//                });
-//    }
 
     public interface TextureRenderer {
         void accept(ContextSimpleBuffer contextSimpleBuffer, int frame);

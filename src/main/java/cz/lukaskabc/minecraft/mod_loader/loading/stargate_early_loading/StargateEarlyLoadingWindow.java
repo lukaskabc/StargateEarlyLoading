@@ -1,5 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
@@ -7,15 +10,15 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Co
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
+import net.neoforged.fml.earlydisplay.SimpleFont;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -24,11 +27,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.ProgressBar.BAR_HEIGHT;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 
+/**
+ * Main class extending default DisplayWindow.
+ * <p>
+ * All the reflection ugly stuff is here only for a single reason, to not copy the whole DisplayWindow
+ * and use the existing implementation instead.
+ */
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
-    public static final String ASSETS_DIRECTORY = "assets";
+    public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + 32;
     private static final Logger LOG = LogManager.getLogger();
     public static int globalAlpha = 255;
     private final RefDisplayWindow accessor;
@@ -42,12 +52,19 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         stargate = ConfigLoader.loadStargate(configuration);
     }
 
-    private List<RenderElement> constructElements() {
-        final List<RenderElement> elements = new ArrayList<>();
-//        elements.add(DarkSkyBackground.create());
-//        elements.addAll(PegasusRefreshedLoop.create());
+    private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
+        final SimpleFont font = accessor.getFont();
+        elements.add(new DarkSkyBackground(configuration.getBackground()).get());
         elements.add(stargate.createRenderElement());
-        return elements;
+        elements.add(new StartupProgressBar(font).get());
+
+        // from forge early loading:
+        // top middle memory info
+        elements.add(RenderElement.performanceBar(font));
+        // bottom left log messages
+        elements.add(RenderElement.logMessageOverlay(font));
+        // bottom right game version
+        elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
     }
 
 
@@ -76,7 +93,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         initWindow(mcVersion);
         final var initializationFuture = renderScheduler.schedule(() -> {
             accessor.initRender(mcVersion, forgeVersion);
-            afterInitRender();
+            afterInitRender(mcVersion, forgeVersion);
         }, 1, TimeUnit.MILLISECONDS);
         accessor.setInitializationFuture(initializationFuture);
         return this::periodicTick;
@@ -87,14 +104,12 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * Since the scheduler is single threaded there is no possibility for race condition
      * with other scheduled tasks.
      */
-    private void afterInitRender() {
+    private void afterInitRender(@Nullable String mcVersion, String forgeVersion) {
         glfwMakeContextCurrent(accessor.getGlWindow());
         recreateContext();
         final List<RenderElement> elements = accessor.getElements();
-        final RenderElement loadingBar = elements.getLast();
         elements.clear();
-        elements.addAll(constructElements());
-        elements.add(loadingBar);
+        constructElements(mcVersion, forgeVersion, elements);
         glfwMakeContextCurrent(0);
     }
 
@@ -142,6 +157,6 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     @Override
     public void addMojangTexture(int textureId) {
-        // do nothing // TODO: is it ok to do this? like ok with license and stuff
+        accessor.getElements().addLast(new MojangLogo(textureId, accessor.getFrameCount()).get());
     }
 }

@@ -18,6 +18,7 @@ import org.joml.Vector2f;
 
 import java.io.FileNotFoundException;
 
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
@@ -29,7 +30,7 @@ public abstract class GenericStargate {
     private static final int STARGATE_POO_SYMBOL_TEXTURE_ID = 5;
     private static final int DEFAULT_TEXTURE_SIZE = 2608;
     public static final float SCALE = 120;
-    public static final Vector2f CENTER = new Vector2f(954f, 947f / 2);
+    public static final Vector2f CENTER = new Vector2f(954f, 947f / 2 + MEMORY_BAR_HEIGHT); // TODO: this is not ok
     protected static final float DEFAULT_RADIUS = 3.5F;
     protected static final int DEFAULT_SIDES = 36;
     protected static final float DEFAULT_RING_HEIGHT = 1F;

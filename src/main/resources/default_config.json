@@ -19,5 +19,6 @@
       "size": 35,
       "file": "assets/symbols/universal/universal.png"
     }
-  }
+  },
+  "background": "assets/dark_sky.png"
 }

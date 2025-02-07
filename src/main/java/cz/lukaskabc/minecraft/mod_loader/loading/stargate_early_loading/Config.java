@@ -1,10 +1,14 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Map;
 
 public class Config {
     private AllowedVariants variants = new AllowedVariants();
     private Map<String, Symbols> symbols = Map.of();
+    @Nullable
+    private String background;
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
@@ -60,5 +64,14 @@ public class Config {
 
     public void setSymbols(Map<String, Symbols> symbols) {
         this.symbols = symbols;
+    }
+
+    @Nullable
+    public String getBackground() {
+        return background;
+    }
+
+    public void setBackground(@Nullable String background) {
+        this.background = background;
     }
 }

@@ -5,7 +5,6 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
 
 public class MilkyWayStargate extends GenericStargate {
-
     public MilkyWayStargate(StargateVariant stargateVariant, Config.Symbols symbols) {
         super((short) 39, stargateVariant, symbols);
         if (stargateVariant.getType() != null && stargateVariant.getType() != StargateType.MILKY_WAY) {

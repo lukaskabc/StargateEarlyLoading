@@ -1,40 +1,52 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
+import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.QuadHelper;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import org.jline.utils.Log;
+import org.jspecify.annotations.Nullable;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.globalAlpha;
+import java.io.FileNotFoundException;
+import java.util.function.Supplier;
 
-public class DarkSkyBackground {
-    private static final String TEXTURE = "dark_sky.png";
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.COLOR;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
-//    public static RenderElement create() {
-//        return RefRenderElement.createQuad(ASSETS_DIRECTORY + "/" + TEXTURE, 34881, 1, DarkSkyBackground::render);
-//    }
+public class DarkSkyBackground implements Supplier<RenderElement> {
+    private static final int TEXTURE_ID = 1;
+    private static final int DEFAULT_TEXTURE_SIZE = 34881;
+    
+    @Nullable
+    private final String texture;
 
-    private static void render(SimpleBufferBuilder bb, RenderElement.DisplayContext ctx, int[] imgSize, int frame) {
-        float widthScale = (float) ctx.width() / imgSize[0];
-        float heightScale = (float) ctx.height() / imgSize[1];
-        float scale = Math.max(widthScale, heightScale);
-        float x1 = imgSize[0] * scale;
-        float y1 = imgSize[1] * scale;
-        QuadHelper.loadQuad(bb, 0f, x1, 0f, y1, 0f, 1f, 0f, 1f, (255 << 24) | 0xFFFFFF);
+    public DarkSkyBackground(@Nullable String texture) {
+        this.texture = texture;
     }
 
-    private static void foxRender(SimpleBufferBuilder bb, RenderElement.DisplayContext context, int[] size, int frame) {
-        int framecount = 28;
-        float aspect = size[0] * (float) framecount / size[1];
-        int outsize = size[0];
-        int offset = outsize / 6;
-        var x0 = context.scaledWidth() - outsize * context.scale() + offset;
-        var x1 = context.scaledWidth() + offset;
-        var y0 = context.scaledHeight() - outsize * context.scale() / aspect + 4 - 25;
-        var y1 = context.scaledHeight() + 4 - 25;
-        int frameidx = frame % framecount;
-        float framesize = 1 / (float) framecount;
-        float framepos = frameidx * framesize;
-        QuadHelper.loadQuad(bb, x0, x1, y0, y1, 0f, 1f, framepos, framepos + framesize, globalAlpha << 24 | 0xFFFFFF);
+
+    @Override
+    public RenderElement get() {
+        try {
+            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        } catch (FileNotFoundException e) {
+            Log.error("Failed to load texture: ", e.getMessage());
+            throw new InitializationException(e);
+        }
+        return RefRenderElement.constructor(this::render);
+    }
+
+    private void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
+        contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
+        QuadHelper.loadQuad(contextSimpleBuffer.simpleBufferBuilder(), 0f, contextSimpleBuffer.context().width(), 0f, contextSimpleBuffer.context().height(), 0f, 1f, 0f, 1f, COLOR);
+        contextSimpleBuffer.simpleBufferBuilder().draw();
     }
 
 }

@@ -3,6 +3,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflect
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
+import net.neoforged.fml.earlydisplay.SimpleFont;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -106,5 +107,13 @@ public class RefDisplayWindow extends ReflectionAccessor {
 
     public Object getFramebuffer() {
         return getFieldValue(clazz, target, "framebuffer");
+    }
+
+    public int getFrameCount() {
+        return (int) getFieldValue(clazz, target, "framecount");
+    }
+
+    public SimpleFont getFont() {
+        return (SimpleFont) getFieldValue(clazz, target, "font");
     }
 }

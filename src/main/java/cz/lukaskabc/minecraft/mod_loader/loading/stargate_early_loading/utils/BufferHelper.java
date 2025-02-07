@@ -4,7 +4,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class BufferHelper {
-    private static final int COLOR = (255 << 24) | 0xFFFFFF;
+    public static final int COLOR = (255 << 24) | 0xFFFFFF;
 
     private BufferHelper() {
         throw new AssertionError();

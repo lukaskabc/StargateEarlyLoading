@@ -54,6 +54,10 @@ public class ReflectionAccessor {
         }
     }
 
+    public Object getFieldValue(final String fieldName) {
+        return getFieldValue(clazz, target, fieldName);
+    }
+
     /**
      * Gets the value of the field with the given name.
      *

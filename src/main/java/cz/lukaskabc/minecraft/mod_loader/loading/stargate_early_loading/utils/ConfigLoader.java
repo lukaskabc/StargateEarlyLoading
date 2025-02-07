@@ -117,8 +117,8 @@ public class ConfigLoader {
      * Tries to resolve file inside {@link #getConfigDirectory()} otherwise resolves file from resources on classpath
      */
     public static InputStream resolveFile(Path path) throws FileNotFoundException {
-        if (path.startsWith("/")) {
-            path = path.subpath(1, path.getNameCount());
+        if (path.startsWith("/") || path.startsWith("\\")) {
+            path = Path.of(path.toString().substring(1));
         }
         final Path configDir = getConfigDirectory().resolve(path);
         if (Files.exists(configDir)) {
