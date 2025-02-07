@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.MilkyWay3Step;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.Background;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
@@ -57,7 +58,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final SimpleFont font = accessor.getFont();
         elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
         elements.add(stargate.createRenderElement());
-        elements.add(new StartupProgressBar(font).get());
+        // TODO: dialing strategy
+        elements.add(new StartupProgressBar(font, new MilkyWay3Step(stargate)).get());
 
         // from forge early loading:
         // top middle memory info

@@ -1,6 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.DialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
@@ -20,14 +21,16 @@ import static java.lang.Math.clamp;
 public class StartupProgressBar extends ProgressBar implements Supplier<RenderElement> {
     private final int lineSpacing;
     private final int descent;
+    private final DialingStrategy dialingStrategy;
 
 
     public interface TextGenerator {
         void accept(SimpleBufferBuilder bb, SimpleFont fh, RenderElement.DisplayContext ctx);
     }
 
-    public StartupProgressBar(SimpleFont font) {
+    public StartupProgressBar(SimpleFont font, DialingStrategy dialingStrategy) {
         super(font);
+        this.dialingStrategy = dialingStrategy;
         final ReflectionAccessor fontAccessor = new ReflectionAccessor(font);
         lineSpacing = (int) fontAccessor.getFieldValue("lineSpacing");
         descent = (int) fontAccessor.getFieldValue("descent");
@@ -40,8 +43,9 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
 
     private void render(ContextSimpleBuffer bb, int frameNumber) {
         List<ProgressMeter> currentProgress = StartupNotificationManager.getCurrentProgress();
+        dialingStrategy.updateProgress(currentProgress);
         final int size = currentProgress.size();
-        final int barCount = 2;
+        final int barCount = 3;
         for (int i = 0; i < barCount && i < size; i++) {
             final ProgressMeter pm = currentProgress.get(i);
             renderBar(bb, frameNumber, i, pm);
