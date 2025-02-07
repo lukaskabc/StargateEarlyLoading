@@ -18,14 +18,17 @@ import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.r
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.COLOR;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
-public class DarkSkyBackground implements Supplier<RenderElement> {
+public class Background implements Supplier<RenderElement> {
     private static final int TEXTURE_ID = 1;
     private static final int DEFAULT_TEXTURE_SIZE = 34881;
-    
+
     @Nullable
     private final String texture;
 
-    public DarkSkyBackground(@Nullable String texture) {
+    public Background(@Nullable String texture) {
+        if (texture == null) {
+            throw new InitializationException("Background texture is null");
+        }
         this.texture = texture;
     }
 

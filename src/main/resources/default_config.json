@@ -1,4 +1,16 @@
+/*
+ * Pay attention to formatting the config, no trailing commas (,) are allowed,
+ * because [a,] is for GSON (library for JSON) the same as [a, null].
+ * On the other hand, comments are allowed, but again,
+ * make sure that by commenting a line you wont create a trailing comma.
+ *
+ * The root directory for paths is either mods classpath
+ * or gameInstance/config/stargate-early-loading
+ * When the same file is present in both locations,
+ * the config directory has priority, allowing to override default files.
+ */
 {
+  // List of stargate variants from which a random one should be chosen for each loading.
   "variants": {
     "milky_way": [
       "default",
@@ -6,9 +18,12 @@
       "sg-1"
     ]
   },
+  // List of symbols referenced from stargate variants
   "symbols": {
     "milky_way:terra": {
+      // Number of symbols in the file
       "size": 38,
+      // Relative path from the classpath/config directory
       "file": "assets/symbols/milky_way/terra.png"
     },
     "pegasus:lantea": {
@@ -20,5 +35,19 @@
       "file": "assets/symbols/universal/universal.png"
     }
   },
-  "background": "assets/dark_sky.png"
+  // List of backgrounds from which a random one should be chosen for each loading
+  "backgrounds": [
+    "assets/backgrounds/abydos_2moons.png",
+    "assets/backgrounds/abydos_3moons.png",
+    "assets/backgrounds/dark_sky.png",
+    "assets/backgrounds/lantea.png",
+    "assets/backgrounds/milkyway.png",
+    "assets/backgrounds/milkyway2.png",
+    "assets/backgrounds/milkyway3.png",
+    "assets/backgrounds/milkyway_side.png",
+    "assets/backgrounds/pegasus.png",
+    "assets/backgrounds/pegasus2.png",
+    "assets/backgrounds/blackhole_bottom.png",
+    "assets/backgrounds/blackhole.png"
+  ]
 }

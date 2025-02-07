@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConfigLoader {
     private static final String STARGATE_VARIANT_CONFIG_DIRECTORY = "stargate-early-loading";
@@ -88,7 +89,7 @@ public class ConfigLoader {
         if (types.isEmpty()) {
             throw new InitializationException("No available stargate variants");
         }
-        return types.toArray(StargateType[]::new);
+        return types.stream().filter(Objects::nonNull).toArray(StargateType[]::new);
     }
 
     /**
@@ -100,6 +101,9 @@ public class ConfigLoader {
             case MILKY_WAY -> configuration.getVariants().getMilkyWay();
             case PEGASUS -> configuration.getVariants().getPegasus();
             case UNIVERSE -> configuration.getVariants().getUniverse();
+            default -> {
+                throw new InitializationException("Unsupported stargate type: " + type);
+            }
         };
         final String variant = Helper.randomElement(variants);
         final StargateVariant stargateVariant = loadStargateVariant(type, variant);

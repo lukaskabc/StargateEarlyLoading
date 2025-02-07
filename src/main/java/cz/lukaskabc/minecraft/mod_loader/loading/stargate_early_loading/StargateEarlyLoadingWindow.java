@@ -1,12 +1,13 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.DarkSkyBackground;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.Background;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -54,7 +55,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
-        elements.add(new DarkSkyBackground(configuration.getBackground()).get());
+        elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
         elements.add(stargate.createRenderElement());
         elements.add(new StartupProgressBar(font).get());
 

@@ -1,14 +1,11 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.Map;
 
 public class Config {
     private AllowedVariants variants = new AllowedVariants();
     private Map<String, Symbols> symbols = Map.of();
-    @Nullable
-    private String background;
+    private String[] backgrounds = new String[0];
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
@@ -42,6 +39,7 @@ public class Config {
         // endregion
     }
 
+    // region <Getters & Setters>
     public record Symbols(int size, String file) {
         public float getTextureOffset(int symbol) {
             symbol -= 1;
@@ -66,12 +64,12 @@ public class Config {
         this.symbols = symbols;
     }
 
-    @Nullable
-    public String getBackground() {
-        return background;
+    public String[] getBackgrounds() {
+        return backgrounds;
     }
 
-    public void setBackground(@Nullable String background) {
-        this.background = background;
+    public void setBackgrounds(String[] backgrounds) {
+        this.backgrounds = backgrounds;
     }
+    // endregion
 }
