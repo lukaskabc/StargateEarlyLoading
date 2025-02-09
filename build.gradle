@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.62-beta'
+    id 'net.neoforged.moddev' version '2.0.78'
 }
 
 version = mod_version
@@ -13,8 +13,8 @@ repositories {
     mavenCentral()
 }
 
-base {
-    archivesName = mod_id
+dependencies {
+    api("org.jspecify:jspecify:1.0.0")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -24,6 +24,11 @@ neoForge {
     version = project.neo_version
 
     runs {
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+
         client {
             client()
         }
@@ -32,18 +37,8 @@ neoForge {
             server()
         }
 
-        gameTestServer {
-            type = "gameTestServer"
-        }
-
         data {
-            clientData()
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-
-        configureEach {
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-            logLevel = org.slf4j.event.Level.DEBUG
+            data()
         }
     }
 
@@ -60,10 +55,6 @@ neoForge {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-dependencies {
-    api("org.jspecify:jspecify:1.0.0")
-}
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [minecraft_version      : minecraft_version,
@@ -97,6 +88,16 @@ publishing {
             url "file://${project.projectDir}/repo"
         }
     }
+}
+
+neoFormRuntime {
+    useEclipseCompiler = true
+    // enableCache = false
+    // verbose = true
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
 idea {

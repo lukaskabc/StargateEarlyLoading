@@ -37,7 +37,7 @@ public class BufferHelper {
     }
 
     public static void renderTexture(ContextSimpleBuffer bb, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, Vector2f u1, Vector2f u2, Vector2f u3, Vector2f u4, Vector2f center) {
-        renderTexture(bb, v1.xy(new Vector2f()), v2.xy(new Vector2f()), v3.xy(new Vector2f()), v4.xy(new Vector2f()), u1, u2, u3, u4, center);
+        renderTexture(bb, new Vector2f(v1.x(), v1.y()), new Vector2f(v2.x(), v2.y()), new Vector2f(v3.x(), v3.y()), new Vector2f(v4.x(), v4.y()), u1, u2, u3, u4, center);
     }
 
     public static void bbPosTex(ContextSimpleBuffer bb, Vector2f v, Vector2f u, int color) {
