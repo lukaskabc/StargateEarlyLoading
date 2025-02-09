@@ -8,8 +8,8 @@
       "blue": 0.247,
       "alpha": 1.0
     },
-    "permanent_point_of_origin": "sgjourney:tauri",
-    "permanent_symbols": "sgjourney:galaxy_milky_way"
+    "permanent_symbols": "milky_way:terra",
+    "permanent_point_of_origin": "assets/symbols/milky_way/tauri_origin.png"
   },
   "stargate_model": {
     "movie_chevron_locking": false,
