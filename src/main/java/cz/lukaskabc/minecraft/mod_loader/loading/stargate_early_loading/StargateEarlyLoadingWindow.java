@@ -81,7 +81,6 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final Runnable result = super.initialize(arguments);
         // force black colour scheme
         accessor.setColourScheme(ColourScheme.BLACK);
-
         return result;
     }
 

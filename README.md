@@ -1,6 +1,6 @@
 # Stargate Early Loading
 
-_Not really a NeoForge mod_ that replaces the game loading.
+_Not really a NeoForge mod_ that replaces the game loading.  
 Yes, including the NeoForge's **early loading** with a custom **animated** one, see screenshots below.
 
 **Note that this is still not ready for real usage.**
@@ -28,7 +28,7 @@ earlyWindowMaximized = true
 ## Customization
 
 It is possible to apply stargate variants from resourcepacks made
-for [StargateJourney](https://github.com/Povstalec/StargateJourney).
+for [StargateJourney](https://github.com/Povstalec/StargateJourney).  
 [Please see docs for more information](https://github.com/lukaskabc/StargateEarlyLoading/tree/main/docs).
 
 ## Credits
@@ -69,9 +69,25 @@ ones - `SimpleFont`, `PerformanceInfo`, and probably others),
 methods, and fields in `DisplayWindow`.
 
 For this reason, I was forced to resort to a very desperate
-approach - [reflection](https://github.com/lukaskabc/StargateEarlyLoading/tree/main/src/main/java/cz/lukaskabc/minecraft/mod_loader/loading/stargate_early_loading/reflection).
-Yes, it is terrible, slow and whatnot.
+approach - [reflection](https://github.com/lukaskabc/StargateEarlyLoading/tree/main/src/main/java/cz/lukaskabc/minecraft/mod_loader/loading/stargate_early_loading/reflection).  
+Yes, it is terrible, slow and whatnot.  
 BUT it works! (with some JVMs and without security managers...)
+
+<details>
+<summary>Some programming stuff</summary>
+So the main class is
+<a href="https://github.com/lukaskabc/StargateEarlyLoading/blob/main/src/main/java/cz/lukaskabc/minecraft/mod_loader/loading/stargate_early_loading/StargateEarlyLoadingWindow.java"><code>StargateEarlyWindow</code></a>.<br>
+The configuration is loaded early in the class construction.<br>
+It loads config, selects random stargate variant and loads its configuration.<br>  
+During initialization, the color scheme is forced to black (<code>Runnable initialize(String[] arguments)</code>).<br>
+The <code>start</code> method had to be overridden for injecting <code>afterInitRender</code> method.<br>
+The <code>afterInitRender</code> method drops the context with frame buffer created in default DisplayWindow implementation,
+clears render elements and injects new ones.<br>
+Then it was required to solve the inaccessible interfaces that are required for the construction of a new <code>RenderElement</code>.
+That was made using dynamic proxies in <a href="https://github.com/lukaskabc/StargateEarlyLoading/blob/main/src/main/java/cz/lukaskabc/minecraft/mod_loader/loading/stargate_early_loading/reflection/RefRenderElement.java"><code>RefRenderElement</code></a> class.
+<br><br>
+And that is somehow it, the rest is rendering with OpenGL without access to any minecraft api and java libraries since they are not even loaded yet.
+</details>
 
 ___
 
