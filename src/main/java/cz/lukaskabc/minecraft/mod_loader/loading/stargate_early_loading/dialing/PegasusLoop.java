@@ -11,7 +11,7 @@ public class PegasusLoop extends DialingStrategy {
     }
 
     @Override
-    public void updateProgress(List<ProgressMeter> progressMeters) {
+    public void updateProgress(List<ProgressMeter> progressMeters, int frameNumber) {
 
     }
 }

@@ -14,6 +14,7 @@ import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleFont;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
@@ -46,8 +47,10 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final RefDisplayWindow accessor;
     private final Config configuration;
     private final GenericStargate stargate;
+    private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
+        stopWatch.start();
         this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
@@ -151,9 +154,18 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         super.render(alpha);
     }
 
+    public boolean loadingAnimationFinished() {
+        if (!configuration.waitForAnimationEnd()) {
+            return true;
+        }
+        return !stargate.isChevronRaised(0) && stargate.isChevronEngaged(0);
+    }
+
     @Override
     public void close() {
         super.close();
+        stopWatch.stop();
+        LOG.info("Closing loading after: {}", stopWatch);
         throw new RuntimeException("Loading completed");
     }
 

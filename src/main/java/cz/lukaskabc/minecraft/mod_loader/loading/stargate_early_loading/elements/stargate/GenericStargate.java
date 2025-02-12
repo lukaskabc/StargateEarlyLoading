@@ -36,7 +36,7 @@ public abstract class GenericStargate {
     protected static final float DEFAULT_RING_HEIGHT = 1F;
     protected static final float STARGATE_RING_SHRINK = 0.001F;
     protected static final float DEFAULT_ANGLE = 360F / DEFAULT_SIDES;
-    protected static final float NUMBER_OF_CHEVRONS = 9;
+    public static final int NUMBER_OF_CHEVRONS = 9;
     protected static final float CHEVRON_ANGLE = 360F / 9;
     // Ring
     protected static final float STARGATE_RING_THICKNESS = 7F;
@@ -75,9 +75,9 @@ public abstract class GenericStargate {
     protected final Config.Symbols symbols;
 
     // bitmap
-    private int engagedChevrons = 0;
+    private volatile int engagedChevrons = 0;
     // bitmap
-    private int raisedChevrons = 0;
+    private volatile int raisedChevrons = 0;
 
     protected GenericStargate(short symbolCount, StargateVariant variant, Config.Symbols symbols) {
         this.symbolCount = symbolCount;
@@ -113,7 +113,7 @@ public abstract class GenericStargate {
         return RefRenderElement.constructor(this::render);
     }
 
-    public void engageChevron(int chevron) {
+    public synchronized void engageChevron(int chevron) {
         engagedChevrons = engagedChevrons | (1 << chevron);
     }
 
@@ -121,8 +121,18 @@ public abstract class GenericStargate {
         return (engagedChevrons & (1 << chevron)) > 0;
     }
 
-    public void raiseChevron(int chevron) {
+    public synchronized void raiseChevron(int chevron) {
+        if (!variant.getStargateModel().isMovieChevronLocking()) {
+            chevron = 0;
+        }
         raisedChevrons = raisedChevrons | (1 << chevron);
+    }
+
+    public synchronized void lowerChevron(int chevron) {
+        if (!variant.getStargateModel().isMovieChevronLocking()) {
+            chevron = 0;
+        }
+        raisedChevrons = raisedChevrons & ~(1 << chevron);
     }
 
     public boolean isChevronRaised(int chevron) {

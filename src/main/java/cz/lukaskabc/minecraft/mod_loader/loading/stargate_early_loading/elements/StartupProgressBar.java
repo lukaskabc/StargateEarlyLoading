@@ -43,7 +43,7 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
 
     private void render(ContextSimpleBuffer bb, int frameNumber) {
         List<ProgressMeter> currentProgress = StartupNotificationManager.getCurrentProgress();
-        dialingStrategy.updateProgress(currentProgress);
+        dialingStrategy.updateProgress(currentProgress, frameNumber);
         final int size = currentProgress.size();
         final int barCount = 3;
         for (int i = 0; i < barCount && i < size; i++) {
