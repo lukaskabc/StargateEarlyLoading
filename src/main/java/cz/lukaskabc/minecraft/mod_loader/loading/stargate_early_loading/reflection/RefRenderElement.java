@@ -8,25 +8,12 @@ import java.lang.reflect.Proxy;
 import java.util.function.Supplier;
 
 public class RefRenderElement extends ReflectionAccessor {
-    public static final Class<?> TEXTURE_RENDERER_CLASS;
-    public static final Class<?> RENDERER_CLASS;
-    public static final Class<?> INITIALIZER_CLASS;
+    public static final Class<?> RENDERER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Renderer");
+    public static final Class<?> INITIALIZER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Initializer");
     public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
-    public static final int INDEX_TEXTURE_OFFSET;
     private static final MethodHandles.Lookup lookup = privateLookup(RenderElement.class);
-    private static final MethodHandle constructor;
-
-    static {
-        try {
-            TEXTURE_RENDERER_CLASS = Class.forName("net.neoforged.fml.earlydisplay.RenderElement$TextureRenderer");
-            RENDERER_CLASS = Class.forName("net.neoforged.fml.earlydisplay.RenderElement$Renderer");
-            INITIALIZER_CLASS = Class.forName("net.neoforged.fml.earlydisplay.RenderElement$Initializer");
-            INDEX_TEXTURE_OFFSET = (int) lookup.findStaticVarHandle(lookup.lookupClass(), "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
-            constructor = findConstructor(lookup, INITIALIZER_CLASS);
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            throw new ReflectionException(e);
-        }
-    }
+    public static final int INDEX_TEXTURE_OFFSET = (int) findStaticField(lookup, "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
+    private static final MethodHandle constructor = findConstructor(lookup, INITIALIZER_CLASS);
 
     public RefRenderElement(RenderElement target) {
         super(target, RenderElement.class);

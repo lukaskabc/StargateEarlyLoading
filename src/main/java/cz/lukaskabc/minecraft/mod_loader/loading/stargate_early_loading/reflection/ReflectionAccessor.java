@@ -74,4 +74,20 @@ public abstract class ReflectionAccessor {
             throw new ReflectionException(e);
         }
     }
+
+    protected static VarHandle findStaticField(final MethodHandles.Lookup privateLookup, String fieldName, Class<?> fieldType) {
+        try {
+            return privateLookup.findStaticVarHandle(privateLookup.lookupClass(), fieldName, fieldType);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ReflectionException(e);
+        }
+    }
+
+    public static Class<?> findClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            throw new ReflectionException(e);
+        }
+    }
 }
