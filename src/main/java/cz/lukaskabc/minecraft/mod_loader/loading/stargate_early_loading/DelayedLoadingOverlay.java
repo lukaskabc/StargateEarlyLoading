@@ -1,31 +1,23 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.server.packs.resources.ReloadInstance;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
-import net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
-public class DelayedLoadingOverlay extends NeoForgeLoadingOverlay {
+public class DelayedLoadingOverlay implements InvocationHandler {
     @Nullable
     private final StargateEarlyLoadingWindow displayWindow;
     private final Field fadeOutStart;
     private boolean delayed = false;
 
-
-    public DelayedLoadingOverlay(Minecraft mc, ReloadInstance reloader, Consumer<Optional<Throwable>> errorConsumer, DisplayWindow displayWindow) {
-        super(mc, reloader, errorConsumer, displayWindow);
-        fadeOutStart = new ReflectionAccessor(this).getField("fadeOutStart");
+    public DelayedLoadingOverlay(DisplayWindow displayWindow) {
+        fadeOutStart = null;//new ReflectionAccessor(this).getField("fadeOutStart");
         if (displayWindow instanceof StargateEarlyLoadingWindow window) {
             this.displayWindow = window;
         } else {
@@ -33,13 +25,7 @@ public class DelayedLoadingOverlay extends NeoForgeLoadingOverlay {
         }
     }
 
-    public static Supplier<LoadingOverlay> newInstance(Supplier<Minecraft> mc, Supplier<ReloadInstance> ri, Consumer<Optional<Throwable>> handler, DisplayWindow window) {
-        return () -> new DelayedLoadingOverlay(mc.get(), ri.get(), handler, window);
-    }
-
-    @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
         if (displayWindow == null) return; // how the hell this happened?
 
         if (displayWindow.loadingAnimationFinished()) {
@@ -71,5 +57,10 @@ public class DelayedLoadingOverlay extends NeoForgeLoadingOverlay {
         } catch (IllegalAccessException e) {
             throw new ReflectionException(e);
         }
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return null;
     }
 }

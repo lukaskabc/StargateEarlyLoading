@@ -1,31 +1,29 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.RenderingException;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Proxy;
 import java.util.function.Supplier;
 
 public class RefRenderElement extends ReflectionAccessor {
-    private static final Logger LOG = LogManager.getLogger();
     public static final Class<?> TEXTURE_RENDERER_CLASS;
     public static final Class<?> RENDERER_CLASS;
     public static final Class<?> INITIALIZER_CLASS;
     public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
     public static final int INDEX_TEXTURE_OFFSET;
+    private static final MethodHandles.Lookup lookup = privateLookup(RenderElement.class);
+    private static final MethodHandle constructor;
 
     static {
         try {
             TEXTURE_RENDERER_CLASS = Class.forName("net.neoforged.fml.earlydisplay.RenderElement$TextureRenderer");
             RENDERER_CLASS = Class.forName("net.neoforged.fml.earlydisplay.RenderElement$Renderer");
             INITIALIZER_CLASS = Class.forName("net.neoforged.fml.earlydisplay.RenderElement$Initializer");
-            INDEX_TEXTURE_OFFSET = (int) getFieldValue(RenderElement.class, null, "INDEX_TEXTURE_OFFSET") + LOADING_INDEX_TEXTURE_OFFSET;
-        } catch (ClassNotFoundException e) {
+            INDEX_TEXTURE_OFFSET = (int) lookup.findStaticVarHandle(lookup.lookupClass(), "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
+            constructor = findConstructor(lookup, INITIALIZER_CLASS);
+        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
             throw new ReflectionException(e);
         }
     }
@@ -37,8 +35,8 @@ public class RefRenderElement extends ReflectionAccessor {
 
     private static RenderElement constructor(final Supplier<?> rendererInitializer) {
         try {
-            return getConstructor(RenderElement.class, INITIALIZER_CLASS).newInstance(rendererInitializer);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            return (RenderElement) constructor.invoke(rendererInitializer);
+        } catch (Throwable e) {
             throw new ReflectionException(e);
         }
     }
@@ -77,35 +75,7 @@ public class RefRenderElement extends ReflectionAccessor {
     private static Object proxyRenderer(TextureRenderer textureRenderer) {
         return Proxy.newProxyInstance(RENDERER_CLASS.getClassLoader(),
                 new Class[]{RENDERER_CLASS},
-                (renderProxy, renderMethod, renderArgs) -> {
-                    if (renderMethod.getName().equals("accept")) {
-                        final SimpleBufferBuilder bb = (SimpleBufferBuilder) renderArgs[0];
-                        final RenderElement.DisplayContext ctx = (RenderElement.DisplayContext) renderArgs[1];
-                        final int frame = (int) renderArgs[2];
-                        try {
-                            textureRenderer.accept(new ContextSimpleBuffer(bb, ctx), frame);
-                        } catch (Throwable t) {
-                            /**
-                             * The problem is that DisplayWindow for whatever reason catch any throwable from rendering
-                             * and just silently logs it, which is very very bad
-                             * This will log it and then exit the application immediately
-                             */
-                            LOG.error("Early loading rendering exception", t);
-                            System.exit(1);
-                            LOG.error("An exception occurred during early loading rendering, the game will exit immediately. No crash report will be generated!");
-                            throw new RenderingException(t);
-                        }
-                        return null;
-                    }
-                    if (!renderMethod.canAccess(renderProxy)) {
-                        renderMethod.setAccessible(true);
-                    }
-                    return renderMethod.invoke(renderProxy, renderArgs);
-                });
-    }
-
-    public interface TextureRenderer {
-        void accept(ContextSimpleBuffer contextSimpleBuffer, int frame);
+                new RendererProxy(textureRenderer));
     }
 
 }

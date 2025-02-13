@@ -3,7 +3,8 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.element
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.DialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefSimpleFont;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.TextureRenderer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -31,9 +32,9 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
     public StartupProgressBar(SimpleFont font, DialingStrategy dialingStrategy) {
         super(font);
         this.dialingStrategy = dialingStrategy;
-        final ReflectionAccessor fontAccessor = new ReflectionAccessor(font);
-        lineSpacing = (int) fontAccessor.getFieldValue("lineSpacing");
-        descent = (int) fontAccessor.getFieldValue("descent");
+        final RefSimpleFont fontAccessor = new RefSimpleFont(font);
+        lineSpacing = fontAccessor.lineSpacing();
+        descent = fontAccessor.descent();
     }
 
     @Override
@@ -57,7 +58,7 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
         final int y = bb.context().scaledHeight() / 2 + cnt * barSpacing + 16 + MEMORY_BAR_HEIGHT;
         final int alpha = 0xFF;
         final int colour = ColourScheme.BLACK.foreground().packedint(alpha);
-        RefRenderElement.TextureRenderer textureRenderer;
+        TextureRenderer textureRenderer;
         if (pm.steps() == 0) {
             textureRenderer = progressBar(ctx -> new int[]{(ctx.scaledWidth() - BAR_WIDTH * ctx.scale()) / 2, y + lineSpacing - descent, BAR_WIDTH * ctx.scale()}, f -> colour, f -> indeterminateBar(f, cnt == 0));
         } else {

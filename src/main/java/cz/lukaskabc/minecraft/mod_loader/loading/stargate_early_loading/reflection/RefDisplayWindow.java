@@ -1,15 +1,14 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.DisplayWindow;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleFont;
+import net.neoforged.fml.earlydisplay.*;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
@@ -17,6 +16,23 @@ import java.util.concurrent.ScheduledFuture;
  * {@link ReflectionAccessor} for {@link DisplayWindow}.
  */
 public class RefDisplayWindow extends ReflectionAccessor {
+    private static final MethodHandles.Lookup lookup = privateLookup(DisplayWindow.class);
+    private static final MethodHandle initRender = findVirtual(lookup, "initRender", void.class, String.class, String.class);
+    private static final VarHandle loadingOverlay = findField(lookup, "loadingOverlay", Method.class);
+    private static final VarHandle renderScheduler = findField(lookup, "renderScheduler", ScheduledExecutorService.class);
+    private static final VarHandle initializationFuture = findField(lookup, "initializationFuture", ScheduledFuture.class);
+    // concrete type is ArrayList<RenderElement>
+    private static final VarHandle elements = findField(lookup, "elements", List.class);
+    private static final VarHandle window = findField(lookup, "window", long.class);
+    private static final VarHandle colourScheme = findField(lookup, "colourScheme", ColourScheme.class);
+    private static final VarHandle maximized = findField(lookup, "maximized", boolean.class);
+    private static final VarHandle fbWidth = findField(lookup, "fbWidth", int.class);
+    private static final VarHandle fbHeight = findField(lookup, "fbHeight", int.class);
+    private static final VarHandle context = findField(lookup, "context", RenderElement.DisplayContext.class);
+    private static final VarHandle framebuffer = findField(lookup, "framebuffer", EarlyFramebuffer.class);
+    private static final VarHandle framecount = findField(lookup, "framecount", int.class);
+    private static final VarHandle font = findField(lookup, "font", SimpleFont.class);
+
     public RefDisplayWindow(DisplayWindow displayWindow) {
         super(displayWindow, DisplayWindow.class);
     }
@@ -26,8 +42,8 @@ public class RefDisplayWindow extends ReflectionAccessor {
      *
      * @param loadingOverlay the new value
      */
-    public void setLoadingOverlay(Method loadingOverlay) {
-        setFieldValue("loadingOverlay", loadingOverlay);
+    public void setLoadingOverlay(Method overlay) {
+        loadingOverlay.set(target, overlay);
     }
 
     /**
@@ -35,9 +51,8 @@ public class RefDisplayWindow extends ReflectionAccessor {
      */
     public void initRender(@Nullable String mcVersion, @NonNull String forgeVersion) {
         try {
-            getMethod("initRender", String.class, String.class)
-                    .invoke(target, mcVersion, forgeVersion);
-        } catch (Exception e) {
+            initRender.invoke(target, mcVersion, forgeVersion);
+        } catch (Throwable e) {
             throw new ReflectionException(e);
         }
     }
@@ -47,8 +62,8 @@ public class RefDisplayWindow extends ReflectionAccessor {
      *
      * @param renderScheduler the new value
      */
-    public void setRenderScheduler(ScheduledExecutorService renderScheduler) {
-        setFieldValue("renderScheduler", renderScheduler);
+    public void setRenderScheduler(ScheduledExecutorService service) {
+        renderScheduler.set(target, service);
     }
 
     /**
@@ -56,64 +71,56 @@ public class RefDisplayWindow extends ReflectionAccessor {
      *
      * @param initializationFuture the new value
      */
-    public void setInitializationFuture(ScheduledFuture<?> initializationFuture) {
-        setFieldValue("initializationFuture", initializationFuture);
+    public void setInitializationFuture(ScheduledFuture<?> future) {
+        initializationFuture.set(target, future);
     }
 
     /**
      * @return the value of the {@link DisplayWindow#elements} field
      */
     @SuppressWarnings("unchecked")
-    public ArrayList<RenderElement> getElements() {
-        return (ArrayList<RenderElement>) getFieldValue(clazz, target, "elements");
-    }
-
-    public void crashElegantly(String errorDetails) {
-        try {
-            getMethod("crashElegantly", String.class).invoke(target, errorDetails);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ReflectionException(e);
-        }
+    public List<RenderElement> getElements() {
+        return (List<RenderElement>) elements.get(target);
     }
 
     public long getGlWindow() {
-        return (long) getFieldValue(clazz, target, "window");
+        return (long) window.get(target);
     }
 
-    public void setColourScheme(ColourScheme colourScheme) {
-        setFieldValue("colourScheme", colourScheme);
+    public void setColourScheme(ColourScheme scheme) {
+        colourScheme.set(target, scheme);
     }
 
     public boolean isMaximized() {
-        return (boolean) getFieldValue(clazz, target, "maximized");
+        return (boolean) maximized.get(target);
     }
 
     public void setFBSize(int width, int height) {
-        setFieldValue("fbWidth", width);
-        setFieldValue("fbHeight", height);
+        fbWidth.set(target, width);
+        fbHeight.set(target, height);
     }
 
     public RenderElement.DisplayContext getContext() {
-        return (RenderElement.DisplayContext) getFieldValue(clazz, target, "context");
+        return (RenderElement.DisplayContext) context.get(target);
     }
 
-    public void setContext(RenderElement.DisplayContext context) {
-        setFieldValue("context", context);
+    public void setContext(RenderElement.DisplayContext ctx) {
+        context.set(target, ctx);
     }
 
-    public void setFrameBuffer(Object framebuffer) {
-        setFieldValue("framebuffer", framebuffer);
+    public void setFrameBuffer(Object fb) {
+        framebuffer.set(target, fb);
     }
 
-    public Object getFramebuffer() {
-        return getFieldValue(clazz, target, "framebuffer");
+    public EarlyFramebuffer getFramebuffer() {
+        return (EarlyFramebuffer) framebuffer.get(target);
     }
 
     public int getFrameCount() {
-        return (int) getFieldValue(clazz, target, "framecount");
+        return (int) framecount.get(target);
     }
 
     public SimpleFont getFont() {
-        return (SimpleFont) getFieldValue(clazz, target, "font");
+        return (SimpleFont) font.get(target);
     }
 }

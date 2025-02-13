@@ -1,8 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefSimpleFont;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.TextureRenderer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.*;
 
@@ -14,8 +14,8 @@ public class ProgressBar {
 
     public ProgressBar(SimpleFont font) {
         this.font = font;
-        final ReflectionAccessor fontAccessor = new ReflectionAccessor(font);
-        fontTextureId = (int) fontAccessor.getFieldValue("textureNumber");
+        final RefSimpleFont fontAccessor = new RefSimpleFont(font);
+        fontTextureId = fontAccessor.textureNumber();
     }
 
     public interface ColorFunction {
@@ -30,7 +30,7 @@ public class ProgressBar {
         int[] location(RenderElement.DisplayContext context);
     }
 
-    public static RefRenderElement.TextureRenderer progressBar(BarPosition position, ColorFunction colourFunction, ProgressDisplay progressDisplay) {
+    public static TextureRenderer progressBar(BarPosition position, ColorFunction colourFunction, ProgressDisplay progressDisplay) {
         return (contextSimpleBuffer, frame) -> {
             final RenderElement.DisplayContext context = contextSimpleBuffer.context();
             final SimpleBufferBuilder bb = contextSimpleBuffer.simpleBufferBuilder();

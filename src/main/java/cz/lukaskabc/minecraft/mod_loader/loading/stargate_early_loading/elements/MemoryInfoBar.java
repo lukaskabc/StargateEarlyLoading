@@ -1,7 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefPerformanceInfo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.PerformanceInfo;
@@ -14,6 +14,7 @@ import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.S
 import static net.neoforged.fml.earlydisplay.RenderElement.hsvToRGB;
 
 public class MemoryInfoBar extends ProgressBar implements Supplier<RenderElement> {
+    private final RefPerformanceInfo performanceInfo = new RefPerformanceInfo();
 
     public MemoryInfoBar(SimpleFont font) {
         super(font);
@@ -27,8 +28,8 @@ public class MemoryInfoBar extends ProgressBar implements Supplier<RenderElement
     private void renderMemoryInfo(final ContextSimpleBuffer bb, final int frameNumber) {
         final int y = bb.context().scaledHeight() - BAR_HEIGHT - 64;
         PerformanceInfo pi = bb.context().performance();
-        final float memory = (float) ReflectionAccessor.getFieldValue(PerformanceInfo.class, pi, "memory");
-        final String text = (String) ReflectionAccessor.getFieldValue(PerformanceInfo.class, pi, "text");
+        final float memory = performanceInfo.memory(pi);
+        final String text = performanceInfo.text(pi);
         final int colour = hsvToRGB((1.0f - (float) Math.pow(memory, 1.5f)) / 3f, 1.0f, 0.5f);
         progressBar(ctx -> new int[]{(ctx.scaledWidth() - BAR_WIDTH * ctx.scale()) / 2, y, BAR_WIDTH * ctx.scale()}, f -> colour, f -> new float[]{0f, memory})
                 .accept(bb, frameNumber);
