@@ -24,10 +24,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.ProgressBar.BAR_HEIGHT;
@@ -43,6 +46,7 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + 32;
     private static final Logger LOG = LogManager.getLogger();
+    public static Class<?> NEOFORGE_LOADING_OVERLAY_CLASS = null;
     public static int globalAlpha = 255;
     private final RefDisplayWindow accessor;
     private final Config configuration;
@@ -143,8 +147,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     public void updateModuleReads(final ModuleLayer layer) {
         var fm = layer.findModule("neoforge").orElseThrow();
         getClass().getModule().addReads(fm);
-        var clz = Class.forName(fm, "net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay");
-        var methods = Arrays.stream(clz.getMethods()).filter(m -> Modifier.isStatic(m.getModifiers())).collect(Collectors.toMap(Method::getName, Function.identity()));
+        NEOFORGE_LOADING_OVERLAY_CLASS = Class.forName(fm, "net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay");
+        var methods = Arrays.stream(NEOFORGE_LOADING_OVERLAY_CLASS.getMethods()).filter(m -> Modifier.isStatic(m.getModifiers())).collect(Collectors.toMap(Method::getName, Function.identity()));
         accessor.setLoadingOverlay(methods.get("newInstance"));
     }
 
@@ -159,6 +163,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
             return true;
         }
         return !stargate.isChevronRaised(0) && stargate.isChevronEngaged(0);
+    }
+
+    @Override
+    public <T> Supplier<T> loadingOverlay(Supplier<?> mc, Supplier<?> ri, Consumer<Optional<Throwable>> ex, boolean fade) {
+        return () -> (T) DelayedLoadingOverlay.constructProxiedOverlay(this, super.loadingOverlay(mc, ri, ex, fade).get());
     }
 
     @Override

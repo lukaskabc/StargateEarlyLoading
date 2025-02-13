@@ -1,23 +1,24 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefNeoLoadingOverlay;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.NEOFORGE_LOADING_OVERLAY_CLASS;
 
 public class DelayedLoadingOverlay implements InvocationHandler {
+    private final RefNeoLoadingOverlay loading;
     @Nullable
     private final StargateEarlyLoadingWindow displayWindow;
-    private final Field fadeOutStart;
     private boolean delayed = false;
 
-    public DelayedLoadingOverlay(DisplayWindow displayWindow) {
-        fadeOutStart = null;//new ReflectionAccessor(this).getField("fadeOutStart");
+    private DelayedLoadingOverlay(DisplayWindow displayWindow, Object neoforgeLoadingOverlay) {
+        loading = new RefNeoLoadingOverlay(neoforgeLoadingOverlay);
         if (displayWindow instanceof StargateEarlyLoadingWindow window) {
             this.displayWindow = window;
         } else {
@@ -25,42 +26,41 @@ public class DelayedLoadingOverlay implements InvocationHandler {
         }
     }
 
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public static Object constructProxiedOverlay(final DisplayWindow displayWindow, final Object neoforgeLoadingOverlay) {
+        // what else should I do... bloody hell
+        Class<?> overlayClass = NEOFORGE_LOADING_OVERLAY_CLASS.getSuperclass().getSuperclass();
+
+        return Proxy.newProxyInstance(NEOFORGE_LOADING_OVERLAY_CLASS.getClassLoader(),
+                new Class[]{overlayClass},
+                new DelayedLoadingOverlay(displayWindow, neoforgeLoadingOverlay));
+    }
+
+    public void render(Object graphics, int mouseX, int mouseY, float partialTick) {
+        loading.render(graphics, mouseX, mouseY, partialTick);
         if (displayWindow == null) return; // how the hell this happened?
 
         if (displayWindow.loadingAnimationFinished()) {
             if (delayed) {
-                setFadeOutStart(Util.getMillis());
+                loading.setFadeOutStart(Util.getMillis());
                 delayed = false;
             }
         } else {
-            if (getFadeOutStart() > -1L) {
+            if (loading.getFadeOutStart() > -1L) {
                 delayed = true;
-                setFadeOutStart(-1L);
+                loading.setFadeOutStart(-1L);
             }
-        }
-
-
-    }
-
-    public long getFadeOutStart() {
-        try {
-            return fadeOutStart.getLong(this);
-        } catch (IllegalAccessException e) {
-            throw new ReflectionException(e);
-        }
-    }
-
-    public void setFadeOutStart(long value) {
-        try {
-            fadeOutStart.setLong(this, value);
-        } catch (IllegalAccessException e) {
-            throw new ReflectionException(e);
         }
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return null;
+        if (method.getName().equals("render")) {
+            render(args[0], (int) args[1], (int) args[2], (float) args[3]);
+            return null; // void method
+        }
+        if (!method.canAccess(proxy)) {
+            method.setAccessible(true);
+        }
+        return method.invoke(proxy, args);
     }
 }
