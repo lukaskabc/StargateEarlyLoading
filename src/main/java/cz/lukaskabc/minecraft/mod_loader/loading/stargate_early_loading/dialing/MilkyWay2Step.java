@@ -2,18 +2,14 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import net.neoforged.fml.loading.progress.ProgressMeter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate.NUMBER_OF_CHEVRONS;
 
 public class MilkyWay2Step extends DialingStrategy {
-    private static final Logger LOG = LogManager.getLogger();
-
-    private int lastFrameExec = 0;
-    private int lastChevron = 1;
+    protected int lastFrameExec = 0;
+    protected int lastChevron = 1;
 
     public MilkyWay2Step(GenericStargate stargate) {
         super(stargate);
@@ -35,7 +31,7 @@ public class MilkyWay2Step extends DialingStrategy {
         }
     }
 
-    private void encodeChevron(int chevron, int frameNumber) {
+    protected void encodeChevron(int chevron, int frameNumber) {
         if (chevron == 9) chevron = 0;
         lastChevron++;
         final int finalChevron = chevron;

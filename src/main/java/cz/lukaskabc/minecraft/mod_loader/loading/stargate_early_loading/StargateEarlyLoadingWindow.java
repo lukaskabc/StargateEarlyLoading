@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.MilkyWay2Step;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.MilkyWay3Step;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.Background;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
@@ -51,11 +51,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
-        final String currentEarlyWindowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
-        if (!name().equals(currentEarlyWindowProvider)) {
-            LOG.warn("Early window provider is not set to {}, updating... old value was: {}", this::name, () -> FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER));
-            FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, this.name());
-        }
+        updateEarlyWindowProviderConfig();
         stopWatch.start();
         this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();
@@ -63,12 +59,20 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         stargate = ConfigLoader.loadStargate(configuration);
     }
 
+    private void updateEarlyWindowProviderConfig() {
+        final String currentEarlyWindowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
+        if (!name().equals(currentEarlyWindowProvider)) {
+            LOG.warn("Early window provider is not set to {}, updating... old value was: {}", this::name, () -> FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER));
+            FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, this.name());
+        }
+    }
+
     private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
         elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
         elements.add(stargate.createRenderElement());
         // TODO: dialing strategy
-        elements.add(new StartupProgressBar(font, new MilkyWay2Step(stargate)).get());
+        elements.add(new StartupProgressBar(font, new MilkyWay3Step(stargate)).get());
 
         // from forge early loading:
         // top middle memory info
@@ -78,7 +82,6 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         // bottom right game version
         elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
     }
-
 
     @Override
     public String name() {
