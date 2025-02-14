@@ -13,6 +13,7 @@ import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleFont;
+import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
+import javax.swing.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -53,11 +55,24 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
+        checkFMLConfig();
         stopWatch.start();
         this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
         stargate = ConfigLoader.loadStargate(configuration);
+    }
+
+    private static void checkFMLConfig() {
+        final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
+        if (!WINDOW_PROVIDER.equals(windowProvider)) {
+            JOptionPane.showMessageDialog(null, """
+                    You have installed the Stargate Early Loading mod,
+                    but the early window provider is not set to StargateEarlyLoading in the fml.toml config!
+                    Please update the config and restart the game.
+                    See mod description for instructions.
+                    """);
+        }
     }
 
     private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
