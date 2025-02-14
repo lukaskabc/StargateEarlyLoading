@@ -6,8 +6,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericChevron.*;
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate.CENTER;
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
 
 public class MovieChevron {
     protected static final float MOVIE_OUTER_CHEVRON_CUTOFF_HEIGHT = 4F / 16;
@@ -50,7 +49,7 @@ public class MovieChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private static void renderLeftMovieOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f) {
@@ -78,7 +77,7 @@ public class MovieChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private static void renderRightMovieChevron(ContextSimpleBuffer bb, Matrix3f matrix3f) {
@@ -106,7 +105,7 @@ public class MovieChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private static void renderRightMovieOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f) {
@@ -134,7 +133,7 @@ public class MovieChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private MovieChevron() {

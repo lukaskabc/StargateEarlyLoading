@@ -2,8 +2,6 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import net.neoforged.fml.loading.progress.ProgressMeter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -25,7 +23,6 @@ public abstract class DialingStrategy {
     public static final float EARLY_CHEVRONS = EARLY_LABELS.size();
     public static final float MINECRAFT_CHEVRONS = NUMBER_OF_CHEVRONS - EARLY_CHEVRONS;
     protected final GenericStargate stargate;
-    private static final Logger LOG = LogManager.getLogger();
     protected final SortedMap<Integer, Runnable> toExecute = new TreeMap<>();
 
     protected DialingStrategy(GenericStargate stargate) {

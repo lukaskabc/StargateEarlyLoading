@@ -5,8 +5,7 @@ import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate.CENTER;
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
 
 public class GenericChevron {
     protected static final float CHEVRON_LIGHT_FRONT_LENGTH = 4F / 16;
@@ -65,7 +64,7 @@ public class GenericChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     public static void renderOuterChevronFront(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised) {
@@ -90,7 +89,7 @@ public class GenericChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private static void renderLeftOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
@@ -108,7 +107,7 @@ public class GenericChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private static void renderCenterOuterChevron(ContextSimpleBuffer bb, Matrix3f matrix3f, boolean isRaised, float yOffset) {
@@ -126,7 +125,7 @@ public class GenericChevron {
         matrix3f.transform(v3);
         matrix3f.transform(v4);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private GenericChevron() {

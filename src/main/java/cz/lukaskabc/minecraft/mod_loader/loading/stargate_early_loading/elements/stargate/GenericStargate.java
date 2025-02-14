@@ -18,9 +18,8 @@ import org.joml.Vector2f;
 
 import java.io.FileNotFoundException;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTexture;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 public abstract class GenericStargate {
@@ -30,7 +29,6 @@ public abstract class GenericStargate {
     private static final int STARGATE_POO_SYMBOL_TEXTURE_ID = 5;
     private static final int DEFAULT_TEXTURE_SIZE = 2608;
     public static final float SCALE = 120;
-    public static final Vector2f CENTER = new Vector2f(954f, 947f / 2 + MEMORY_BAR_HEIGHT); // TODO: this is not ok
     protected static final float DEFAULT_RADIUS = 3.5F;
     protected static final int DEFAULT_SIDES = 36;
     protected static final float DEFAULT_RING_HEIGHT = 1F;
@@ -157,7 +155,7 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(texBase + STARGATE_RING_INNER_CENTER * 16, 33.5F + STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(texBase + STARGATE_RING_START_CENTER * 16, 33.5F - STARGATE_CUTOUT_TO_INNER_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     protected static void renderOuterRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
@@ -178,7 +176,7 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(texBase + 5, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(texBase + 5, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     private void initRender(ContextSimpleBuffer contextSimpleBuffer) {
@@ -235,7 +233,7 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(9.5F + DIVIDER_CENTER * 16, 46 + DIVIDER_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(9.5F + DIVIDER_CENTER * 16, 46 - DIVIDER_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
     protected void renderSymbolRingSegment(ContextSimpleBuffer bb, Matrix2f m, int symbol, float rotation) {
@@ -257,7 +255,7 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f(4 + stargateSymbolRingInnerCenter * 16, 46 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
         Vector2f u4 = new Vector2f(4 + stargateSymbolRingOuterCenter * 16, 46 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 16);
 
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER);
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
         renderSymbol(bb, matrix2f, symbol);
     }
 
@@ -344,7 +342,7 @@ public abstract class GenericStargate {
         Vector2f u4 = new Vector2f((symbolOffset + (stargateSymbolRingOuterCenter * 32 / 16 / textureXSize)) * 64, (8 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 32) * 4);
 
         // TODO: engaged symbols
-        renderTexture(bb, v1, v2, v3, v4, u1, u2, u3, u4, CENTER, variant.getSymbols().getSymbolColor().packedColor());
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, variant.getSymbols().getSymbolColor().packedColor());
     }
 
     protected void renderSymbol(ContextSimpleBuffer bb, Matrix2f matrix2f, int symbol) {

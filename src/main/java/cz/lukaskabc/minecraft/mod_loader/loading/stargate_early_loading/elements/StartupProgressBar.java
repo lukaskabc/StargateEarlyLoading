@@ -1,6 +1,5 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.DialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefSimpleFont;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.getGlobalAlpha;
 import static java.lang.Math.clamp;
 
 public class StartupProgressBar extends ProgressBar implements Supplier<RenderElement> {
@@ -69,7 +69,7 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
     }
 
     private static float[] indeterminateBar(int frame, boolean isActive) {
-        if (StargateEarlyLoadingWindow.globalAlpha != 0xFF || !isActive) {
+        if (getGlobalAlpha() != 0xFF || !isActive) {
             return new float[]{0f, 1f};
         } else {
             var progress = frame % 100;

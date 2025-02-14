@@ -10,7 +10,7 @@ import net.neoforged.fml.earlydisplay.SimpleFont;
 
 import java.util.function.Supplier;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.globalAlpha;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.getGlobalAlpha;
 import static net.neoforged.fml.earlydisplay.RenderElement.hsvToRGB;
 
 public class MemoryInfoBar extends ProgressBar implements Supplier<RenderElement> {
@@ -34,6 +34,6 @@ public class MemoryInfoBar extends ProgressBar implements Supplier<RenderElement
         progressBar(ctx -> new int[]{(ctx.scaledWidth() - BAR_WIDTH * ctx.scale()) / 2, y, BAR_WIDTH * ctx.scale()}, f -> colour, f -> new float[]{0f, memory})
                 .accept(bb, frameNumber);
         final int width = font.stringWidth(text);
-        renderText(text(bb.context().scaledWidth() / 2 - width / 2, y + BAR_HEIGHT, text, ColourScheme.BLACK.foreground().packedint(globalAlpha)), bb);
+        renderText(text(bb.context().scaledWidth() / 2 - width / 2, y + BAR_HEIGHT, text, ColourScheme.BLACK.foreground().packedint(getGlobalAlpha())), bb);
     }
 }

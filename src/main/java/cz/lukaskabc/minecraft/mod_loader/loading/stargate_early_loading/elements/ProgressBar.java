@@ -1,10 +1,11 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefSimpleFont;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.TextureRenderer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.*;
+
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.getGlobalAlpha;
 
 public class ProgressBar {
     public static final int BAR_HEIGHT = 20;
@@ -53,7 +54,7 @@ public class ProgressBar {
             x1 -= inset;
             y0 += inset;
             y1 -= inset;
-            QuadHelper.loadQuad(bb, x0, x1, y0, y1, 0f, 0f, 0f, 0f, context.colourScheme().background().packedint(StargateEarlyLoadingWindow.globalAlpha));
+            QuadHelper.loadQuad(bb, x0, x1, y0, y1, 0f, 0f, 0f, 0f, context.colourScheme().background().packedint(getGlobalAlpha()));
 
             x1 = x0 + inset + (int) (progress[1] * pos[2]);
             x0 += (int) (inset + progress[0] * pos[2]);

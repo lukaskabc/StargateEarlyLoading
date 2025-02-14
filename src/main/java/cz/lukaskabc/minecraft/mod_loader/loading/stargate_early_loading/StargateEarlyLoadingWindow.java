@@ -18,6 +18,7 @@ import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -44,7 +45,8 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + 32;
     private static final Logger LOG = LogManager.getLogger();
-    public static int globalAlpha = 255;
+    private static int globalAlpha = 255;
+    private static Vector2f center = new Vector2f(1, 1);
     private final RefDisplayWindow accessor;
     private final Config configuration;
     private final GenericStargate stargate;
@@ -127,25 +129,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         glfwMakeContextCurrent(0);
     }
 
-    private void recreateContext() {
-        final RenderElement.DisplayContext oldContext = accessor.getContext();
-        final Object oldFrameBuffer = accessor.getFramebuffer();
-        final int[] width = new int[1];
-        final int[] height = new int[1];
-        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
-        accessor.setFBSize(width[0], height[0]);
-        final RenderElement.DisplayContext context = new RenderElement.DisplayContext(width[0], height[0], oldContext.scale(), oldContext.elementShader(), oldContext.colourScheme(), oldContext.performance());
-        accessor.setContext(context);
-        try {
-            final Constructor<?> constructor = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredConstructor(RenderElement.DisplayContext.class);
-            constructor.setAccessible(true);
-            accessor.setFrameBuffer(constructor.newInstance(context));
-            final Method close = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredMethod("close");
-            close.setAccessible(true);
-            close.invoke(oldFrameBuffer);
-        } catch (Exception e) {
-            throw new ReflectionException(e);
-        }
+    public static int getGlobalAlpha() {
+        return globalAlpha;
     }
 
     @Override
@@ -157,10 +142,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         accessor.setLoadingOverlay(methods.get("newInstance"));
     }
 
-    @Override
-    public void render(int alpha) {
-        globalAlpha = alpha;
-        super.render(alpha);
+    public static void setGlobalAlpha(int globalAlpha) {
+        StargateEarlyLoadingWindow.globalAlpha = globalAlpha;
     }
 
     @SuppressWarnings("unused")
@@ -179,5 +162,41 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     @Override
     public void addMojangTexture(int textureId) {
         accessor.getElements().addLast(new MojangLogo(textureId, accessor.getFrameCount()).get());
+    }
+
+    public static Vector2f getCenter() {
+        return center;
+    }
+
+    public static void setCenter(final int x, final int y) {
+        StargateEarlyLoadingWindow.center.set(x, y + MEMORY_BAR_HEIGHT);
+    }
+
+    @Override
+    public void render(int alpha) {
+        globalAlpha = alpha;
+        super.render(alpha);
+    }
+
+    private void recreateContext() {
+        final RenderElement.DisplayContext oldContext = accessor.getContext();
+        final Object oldFrameBuffer = accessor.getFramebuffer();
+        final int[] width = new int[1];
+        final int[] height = new int[1];
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        accessor.setFBSize(width[0], height[0]);
+        setCenter(width[0] / 2, height[0] / 2);
+        final RenderElement.DisplayContext context = new RenderElement.DisplayContext(width[0], height[0], oldContext.scale(), oldContext.elementShader(), oldContext.colourScheme(), oldContext.performance());
+        accessor.setContext(context);
+        try {
+            final Constructor<?> constructor = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredConstructor(RenderElement.DisplayContext.class);
+            constructor.setAccessible(true);
+            accessor.setFrameBuffer(constructor.newInstance(context));
+            final Method close = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredMethod("close");
+            close.setAccessible(true);
+            close.invoke(oldFrameBuffer);
+        } catch (Exception e) {
+            throw new ReflectionException(e);
+        }
     }
 }
