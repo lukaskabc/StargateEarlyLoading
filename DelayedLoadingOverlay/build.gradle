@@ -23,7 +23,7 @@ base {
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
-    implementation("${mod_group_id}:StargateEarlyLoading:0.1")
+    implementation("${mod_group_id}:StargateEarlyLoading:[0.1,)")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
