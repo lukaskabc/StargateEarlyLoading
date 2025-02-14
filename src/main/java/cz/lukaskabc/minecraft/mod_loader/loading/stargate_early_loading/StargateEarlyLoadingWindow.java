@@ -164,7 +164,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         super.close();
         stopWatch.stop();
         LOG.info("Closing loading after: {}", stopWatch);
-        throw new RuntimeException("Loading completed");
+        //throw new RuntimeException("Loading completed");
     }
 
     @Override

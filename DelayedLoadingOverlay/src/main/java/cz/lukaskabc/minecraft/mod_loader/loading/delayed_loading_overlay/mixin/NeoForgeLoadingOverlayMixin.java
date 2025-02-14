@@ -1,7 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.delayed_loading_overlay.mixin;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
@@ -21,8 +20,6 @@ import java.util.function.Consumer;
 
 @Mixin(NeoForgeLoadingOverlay.class)
 public abstract class NeoForgeLoadingOverlayMixin extends LoadingOverlay {
-    @Unique
-    private static final long DELAYED = -2L;
     @Nullable
     @Unique
     private StargateEarlyLoadingWindow stargateWindow;
@@ -40,20 +37,15 @@ public abstract class NeoForgeLoadingOverlayMixin extends LoadingOverlay {
         } else {
             stargateWindow = null;
         }
+        fadeOutStart = -2L;
     }
 
     @Inject(method = "render", at = @At("RETURN"))
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (stargateWindow == null) return; // how the hell this happened?
 
-        if (stargateWindow.loadingAnimationFinished()) {
-            if (fadeOutStart == DELAYED) {
-                fadeOutStart = Util.getMillis();
-            }
-        } else {
-            if (fadeOutStart > DELAYED) {
-                fadeOutStart = DELAYED;
-            }
+        if (stargateWindow.loadingAnimationFinished() && fadeOutStart < 0) {
+            fadeOutStart = -1L;
         }
     }
 }

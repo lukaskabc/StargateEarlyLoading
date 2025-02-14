@@ -6,7 +6,6 @@ public class Config {
     private AllowedVariants variants = new AllowedVariants();
     private Map<String, Symbols> symbols = Map.of();
     private String[] backgrounds = new String[0];
-    private boolean waitForAnimationEnd = false;
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
@@ -72,14 +71,5 @@ public class Config {
     public void setBackgrounds(String[] backgrounds) {
         this.backgrounds = backgrounds;
     }
-
-    public boolean waitForAnimationEnd() {
-        return waitForAnimationEnd;
-    }
-
-    public void setWaitForAnimationEnd(boolean waitForAnimationEnd) {
-        this.waitForAnimationEnd = waitForAnimationEnd;
-    }
-
     // endregion
 }

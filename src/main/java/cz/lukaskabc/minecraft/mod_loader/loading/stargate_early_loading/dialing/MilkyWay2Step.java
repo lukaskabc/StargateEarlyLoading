@@ -14,7 +14,7 @@ public class MilkyWay2Step extends DialingStrategy {
     private static final int ENCODE_DELAY = 10;
     private static final float EARLY_CHEVRONS = EARLY_LABELS.size();
     private static final float MINECRAFT_CHEVRONS = NUMBER_OF_CHEVRONS - EARLY_CHEVRONS;
-    private int skipFrames = 0;
+    private int lastFrameExec = 0;
     private int lastChevron = 1;
 
     public MilkyWay2Step(GenericStargate stargate) {
@@ -29,10 +29,9 @@ public class MilkyWay2Step extends DialingStrategy {
         final float minecraftProgress = getMinecraftProgress(progressMeters);
 
         for (int chevron = lastChevron; chevron <= NUMBER_OF_CHEVRONS; chevron++) {
-            if (chevron / EARLY_CHEVRONS <= earlyProgress) {
-                encodeChevron(chevron, frameNumber);
-            }
-            if (chevron / MINECRAFT_CHEVRONS <= minecraftProgress) {
+            final boolean shouldEncodeEarly = chevron / EARLY_CHEVRONS <= earlyProgress;
+            final boolean shouldEncodeMinecraft = chevron / MINECRAFT_CHEVRONS <= minecraftProgress || minecraftProgress > 0.95f;
+            if (shouldEncodeEarly || shouldEncodeMinecraft) {
                 encodeChevron(chevron, frameNumber);
             }
         }
@@ -42,13 +41,13 @@ public class MilkyWay2Step extends DialingStrategy {
         if (chevron == 9) chevron = 0;
         lastChevron++;
         final int finalChevron = chevron;
-        executeAfter(frameNumber + skipFrames, () -> {
+        lastFrameExec = Math.max(frameNumber, lastFrameExec) + 2 * ENCODE_DELAY;
+        executeAfter(lastFrameExec - ENCODE_DELAY, () -> {
             stargate.raiseChevron(finalChevron);
         });
-        executeAfter(frameNumber + ENCODE_DELAY + skipFrames, () -> {
+        executeAfter(lastFrameExec, () -> {
             stargate.engageChevron(finalChevron);
             stargate.lowerChevron(finalChevron);
         });
-        skipFrames += ENCODE_DELAY;
     }
 }
