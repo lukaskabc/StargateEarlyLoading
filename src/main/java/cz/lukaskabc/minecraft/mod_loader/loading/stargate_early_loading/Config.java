@@ -71,5 +71,6 @@ public class Config {
     public void setBackgrounds(String[] backgrounds) {
         this.backgrounds = backgrounds;
     }
+
     // endregion
 }

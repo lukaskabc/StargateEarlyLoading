@@ -34,10 +34,10 @@ public abstract class NeoForgeLoadingOverlayMixin extends LoadingOverlay {
     public void init(Minecraft mc, ReloadInstance reloader, Consumer<?> errorConsumer, DisplayWindow displayWindow, CallbackInfo ci) {
         if (displayWindow instanceof StargateEarlyLoadingWindow stargateEarlyLoadingWindow) {
             stargateWindow = stargateEarlyLoadingWindow;
+            fadeOutStart = -2L;
         } else {
             stargateWindow = null;
         }
-        fadeOutStart = -2L;
     }
 
     @Inject(method = "render", at = @At("RETURN"))

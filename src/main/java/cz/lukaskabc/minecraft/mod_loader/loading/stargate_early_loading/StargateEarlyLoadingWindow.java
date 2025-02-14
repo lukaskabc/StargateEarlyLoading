@@ -13,7 +13,6 @@ import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleFont;
-import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -43,6 +42,7 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
  * and use the existing implementation instead.
  */
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
+    public static final String WINDOW_PROVIDER = "StargateEarlyLoading";
     public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + 32;
     private static final Logger LOG = LogManager.getLogger();
     private static int globalAlpha = 255;
@@ -53,20 +53,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
-        updateEarlyWindowProviderConfig();
         stopWatch.start();
         this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
         stargate = ConfigLoader.loadStargate(configuration);
-    }
-
-    private void updateEarlyWindowProviderConfig() {
-        final String currentEarlyWindowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
-        if (!name().equals(currentEarlyWindowProvider)) {
-            LOG.warn("Early window provider is not set to {}, updating... old value was: {}", this::name, () -> FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER));
-            FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, this.name());
-        }
     }
 
     private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
@@ -87,7 +78,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
     @Override
     public String name() {
-        return "StargateEarlyLoading";
+        return WINDOW_PROVIDER;
     }
 
     @Override
