@@ -25,10 +25,6 @@ public class MilkyWay2Step extends DialingStrategy {
     public void updateProgress(List<ProgressMeter> progressMeters, int frameNumber) {
         super.updateProgress(progressMeters, frameNumber);
 
-        progressMeters.forEach(m -> {
-            LOG.info("{} {}/{} {}", m.name(), m.progress(), m.steps(), m.label().getText());
-        });
-
         final float earlyProgress = earlyProgress(progressMeters);
         final float minecraftProgress = getMinecraftProgress(progressMeters);
 

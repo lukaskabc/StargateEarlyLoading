@@ -12,10 +12,6 @@ tasks.named('wrapper', Wrapper).configure {
 version = mod_version
 group = mod_group_id
 
-base {
-    archivesName = mod_id
-}
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -23,6 +19,7 @@ repositories {
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
+    implementation("${mod_group_id}:StargateEarlyLoading:0.1")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -64,6 +61,28 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
 publishing {
     publications {
@@ -80,6 +99,8 @@ publishing {
 
 neoFormRuntime {
     useEclipseCompiler = true
+    // enableCache = false
+    // verbose = true
 }
 
 tasks.withType(JavaCompile).configureEach {

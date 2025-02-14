@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "cz.lukaskabc.minecraft.mod_loader.loading.delayed_loading_overlay.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "NeoForgeLoadingOverlayMixin"
+  ],
+  "minVersion": "0.8"
+}

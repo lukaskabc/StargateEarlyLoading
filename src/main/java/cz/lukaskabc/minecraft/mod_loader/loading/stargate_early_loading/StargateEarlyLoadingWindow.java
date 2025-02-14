@@ -154,10 +154,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         super.render(alpha);
     }
 
+    @SuppressWarnings("unused")
     public boolean loadingAnimationFinished() {
-        if (!configuration.waitForAnimationEnd()) {
-            return true;
-        }
         return !stargate.isChevronRaised(0) && stargate.isChevronEngaged(0);
     }
 

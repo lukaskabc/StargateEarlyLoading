@@ -49,6 +49,5 @@
     "assets/backgrounds/pegasus2.png",
     "assets/backgrounds/blackhole_bottom.png",
     "assets/backgrounds/blackhole.png"
-  ],
-  "wait_for_animation_end": false
+  ]
 }
