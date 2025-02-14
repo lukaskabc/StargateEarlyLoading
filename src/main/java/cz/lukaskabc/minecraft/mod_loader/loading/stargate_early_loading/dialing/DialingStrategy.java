@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate.NUMBER_OF_CHEVRONS;
+
 public abstract class DialingStrategy {
     protected static final Set<String> EARLY_LABELS = Set.of(
             "Launching minecraft",
@@ -19,6 +21,9 @@ public abstract class DialingStrategy {
     );
     public static final String MINECRAFT_PROGRESS = "Minecraft Progress";
     public static final String EARLY_PROGRESS = "EARLY";
+    public static final int ENCODE_DELAY = 20;
+    public static final float EARLY_CHEVRONS = EARLY_LABELS.size();
+    public static final float MINECRAFT_CHEVRONS = NUMBER_OF_CHEVRONS - EARLY_CHEVRONS;
     protected final GenericStargate stargate;
     private static final Logger LOG = LogManager.getLogger();
     protected final SortedMap<Integer, Runnable> toExecute = new TreeMap<>();

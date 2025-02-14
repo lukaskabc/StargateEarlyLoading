@@ -13,6 +13,7 @@ import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleFont;
+import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +51,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
+        final String currentEarlyWindowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
+        if (!name().equals(currentEarlyWindowProvider)) {
+            LOG.warn("Early window provider is not set to {}, updating... old value was: {}", this::name, () -> FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER));
+            FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, this.name());
+        }
         stopWatch.start();
         this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();

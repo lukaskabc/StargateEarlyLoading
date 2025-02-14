@@ -11,9 +11,7 @@ import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.e
 
 public class MilkyWay2Step extends DialingStrategy {
     private static final Logger LOG = LogManager.getLogger();
-    private static final int ENCODE_DELAY = 10;
-    private static final float EARLY_CHEVRONS = EARLY_LABELS.size();
-    private static final float MINECRAFT_CHEVRONS = NUMBER_OF_CHEVRONS - EARLY_CHEVRONS;
+
     private int lastFrameExec = 0;
     private int lastChevron = 1;
 
@@ -41,7 +39,7 @@ public class MilkyWay2Step extends DialingStrategy {
         if (chevron == 9) chevron = 0;
         lastChevron++;
         final int finalChevron = chevron;
-        lastFrameExec = Math.max(frameNumber, lastFrameExec) + 2 * ENCODE_DELAY;
+        lastFrameExec = Math.max(frameNumber, lastFrameExec + ENCODE_DELAY) + ENCODE_DELAY;
         executeAfter(lastFrameExec - ENCODE_DELAY, () -> {
             stargate.raiseChevron(finalChevron);
         });
