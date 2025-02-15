@@ -6,7 +6,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionException;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefEarlyFrameBuffer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -22,7 +22,6 @@ import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -45,7 +44,8 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
  */
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final String WINDOW_PROVIDER = "StargateEarlyLoading";
-    public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + 32;
+    public static final int MEMORY_BAR_OFFSET = 32;
+    public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + MEMORY_BAR_OFFSET;
     private static final Logger LOG = LogManager.getLogger();
     private static int globalAlpha = 255;
     private static Vector2f center = new Vector2f(1, 1);
@@ -55,9 +55,9 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
+        this.accessor = new RefDisplayWindow(this);
         checkFMLConfig();
         stopWatch.start();
-        this.accessor = new RefDisplayWindow(this);
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
         stargate = ConfigLoader.loadStargate(configuration);
@@ -162,7 +162,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         super.close();
         stopWatch.stop();
         LOG.info("Closing loading after: {}", stopWatch);
-        //throw new RuntimeException("Loading completed");
+        throw new RuntimeException("Loading completed");
     }
 
     @Override
@@ -175,7 +175,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     }
 
     public static void setCenter(final int x, final int y) {
-        StargateEarlyLoadingWindow.center.set(x, y + MEMORY_BAR_HEIGHT);
+        StargateEarlyLoadingWindow.center.set(x, y + (float) BAR_HEIGHT);
     }
 
     @Override
@@ -194,15 +194,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         setCenter(width[0] / 2, height[0] / 2);
         final RenderElement.DisplayContext context = new RenderElement.DisplayContext(width[0], height[0], oldContext.scale(), oldContext.elementShader(), oldContext.colourScheme(), oldContext.performance());
         accessor.setContext(context);
-        try {
-            final Constructor<?> constructor = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredConstructor(RenderElement.DisplayContext.class);
-            constructor.setAccessible(true);
-            accessor.setFrameBuffer(constructor.newInstance(context));
-            final Method close = Class.forName("net.neoforged.fml.earlydisplay.EarlyFramebuffer").getDeclaredMethod("close");
-            close.setAccessible(true);
-            close.invoke(oldFrameBuffer);
-        } catch (Exception e) {
-            throw new ReflectionException(e);
-        }
+        accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
+        RefEarlyFrameBuffer.close(oldFrameBuffer);
     }
 }

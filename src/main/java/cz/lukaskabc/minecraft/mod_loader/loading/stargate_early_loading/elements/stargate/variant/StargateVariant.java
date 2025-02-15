@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullUnmarked;
 
@@ -59,6 +60,18 @@ public class StargateVariant {
 
     public void setStargateModel(@NonNull VariantModel stargateModel) {
         this.stargateModel = stargateModel;
+    }
+
+    public void engageChevron(int chevron, GenericStargate genericStargate) {
+        genericStargate.setChevronEngaged(chevron, true);
+    }
+
+    public void raiseChevron(int chevron, GenericStargate genericStargate) {
+        genericStargate.doRaiseChevron(chevron);
+    }
+
+    public void lowerChevron(int chevron, GenericStargate genericStargate) {
+        genericStargate.doLowerChevron(chevron);
     }
     // endregion
 }

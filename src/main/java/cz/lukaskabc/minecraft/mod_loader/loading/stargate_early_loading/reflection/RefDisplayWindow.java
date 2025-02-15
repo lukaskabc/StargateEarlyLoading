@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Semaphore;
 
 /**
  * {@link ReflectionAccessor} for {@link DisplayWindow}.
@@ -18,6 +19,8 @@ import java.util.concurrent.ScheduledFuture;
 public class RefDisplayWindow extends ReflectionAccessor {
     private static final MethodHandles.Lookup lookup = privateLookup(DisplayWindow.class);
     private static final MethodHandle initRender = findVirtual(lookup, "initRender", void.class, String.class, String.class);
+    private static final MethodHandle fbResize = findVirtual(lookup, "fbResize", void.class, long.class, int.class, int.class);
+    private static final MethodHandle renderThreadFunc = findVirtual(lookup, "renderThreadFunc", void.class);
     private static final VarHandle loadingOverlay = findField(lookup, "loadingOverlay", Method.class);
     private static final VarHandle renderScheduler = findField(lookup, "renderScheduler", ScheduledExecutorService.class);
     private static final VarHandle initializationFuture = findField(lookup, "initializationFuture", ScheduledFuture.class);
@@ -32,6 +35,8 @@ public class RefDisplayWindow extends ReflectionAccessor {
     private static final VarHandle framebuffer = findField(lookup, "framebuffer", EarlyFramebuffer.class);
     private static final VarHandle framecount = findField(lookup, "framecount", int.class);
     private static final VarHandle font = findField(lookup, "font", SimpleFont.class);
+    private static final VarHandle renderLock = findField(lookup, "renderLock", Semaphore.class);
+    private static final VarHandle windowTick = findField(lookup, "windowTick", ScheduledFuture.class);
 
     public RefDisplayWindow(DisplayWindow displayWindow) {
         super(displayWindow, DisplayWindow.class);
@@ -64,6 +69,10 @@ public class RefDisplayWindow extends ReflectionAccessor {
      */
     public void setRenderScheduler(ScheduledExecutorService service) {
         renderScheduler.set(target, service);
+    }
+
+    public ScheduledExecutorService getRenderScheduler() {
+        return (ScheduledExecutorService) renderScheduler.get(target);
     }
 
     /**
@@ -122,5 +131,41 @@ public class RefDisplayWindow extends ReflectionAccessor {
 
     public SimpleFont getFont() {
         return (SimpleFont) font.get(target);
+    }
+
+    public int getFbWidth() {
+        return (int) fbWidth.get(target);
+    }
+
+    public int getFbHeight() {
+        return (int) fbHeight.get(target);
+    }
+
+    public Semaphore getRenderLock() {
+        return (Semaphore) renderLock.get(target);
+    }
+
+    public void fbResize(final long window, final int width, final int height) {
+        try {
+            fbResize.invoke(target, window, width, height);
+        } catch (Throwable e) {
+            throw new ReflectionException(e);
+        }
+    }
+
+    public ScheduledFuture<?> getWindowTick() {
+        return (ScheduledFuture<?>) windowTick.get(target);
+    }
+
+    public void setWindowTick(ScheduledFuture<?> future) {
+        windowTick.set(target, future);
+    }
+
+    public void renderThreadFunc() {
+        try {
+            renderThreadFunc.invoke(target);
+        } catch (Throwable e) {
+            throw new ReflectionException(e);
+        }
     }
 }

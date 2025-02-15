@@ -26,13 +26,12 @@ public class MilkyWay2Step extends DialingStrategy {
             final boolean shouldEncodeEarly = chevron / EARLY_CHEVRONS <= earlyProgress;
             final boolean shouldEncodeMinecraft = chevron / MINECRAFT_CHEVRONS <= minecraftProgress || minecraftProgress > 0.95f;
             if (shouldEncodeEarly || shouldEncodeMinecraft) {
-                encodeChevron(chevron, frameNumber);
+                encodeChevron(chevron > 8 ? 0 : chevron, frameNumber);
             }
         }
     }
 
     protected void encodeChevron(int chevron, int frameNumber) {
-        if (chevron == 9) chevron = 0;
         lastChevron++;
         final int finalChevron = chevron;
         lastFrameExec = Math.max(frameNumber, lastFrameExec + ENCODE_DELAY) + ENCODE_DELAY;

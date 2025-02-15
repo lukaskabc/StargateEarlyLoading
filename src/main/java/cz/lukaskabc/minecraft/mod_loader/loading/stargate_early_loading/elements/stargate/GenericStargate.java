@@ -28,7 +28,6 @@ public abstract class GenericStargate {
     private static final int STARGATE_SYMBOLS_TEXTURE_ID = 4;
     private static final int STARGATE_POO_SYMBOL_TEXTURE_ID = 5;
     private static final int DEFAULT_TEXTURE_SIZE = 2608;
-    public static final float SCALE = 120;
     protected static final float DEFAULT_RADIUS = 3.5F;
     protected static final int DEFAULT_SIDES = 36;
     protected static final float DEFAULT_RING_HEIGHT = 1F;
@@ -112,24 +111,34 @@ public abstract class GenericStargate {
     }
 
     public synchronized void engageChevron(int chevron) {
-        engagedChevrons = engagedChevrons | (1 << chevron);
+        variant.engageChevron(chevron, this);
+    }
+
+    public synchronized void raiseChevron(int chevron) {
+        variant.raiseChevron(chevron, this);
+    }
+
+    public synchronized void lowerChevron(int chevron) {
+        variant.lowerChevron(chevron, this);
+    }
+
+    public synchronized void setChevronEngaged(int chevron, boolean engaged) {
+        if (engaged) {
+            engagedChevrons |= (1 << chevron);
+        } else {
+            engagedChevrons &= ~(1 << chevron);
+        }
     }
 
     public boolean isChevronEngaged(int chevron) {
         return (engagedChevrons & (1 << chevron)) > 0;
     }
 
-    public synchronized void raiseChevron(int chevron) {
-        if (!variant.getStargateModel().isMovieChevronLocking()) {
-            chevron = 0;
-        }
+    public synchronized void doRaiseChevron(int chevron) {
         raisedChevrons = raisedChevrons | (1 << chevron);
     }
 
-    public synchronized void lowerChevron(int chevron) {
-        if (!variant.getStargateModel().isMovieChevronLocking()) {
-            chevron = 0;
-        }
+    public synchronized void doLowerChevron(int chevron) {
         raisedChevrons = raisedChevrons & ~(1 << chevron);
     }
 
@@ -191,7 +200,8 @@ public abstract class GenericStargate {
         final float rotation = ((frame / 5f) % 360) / 156f * 360F;
 
         Matrix2f matrix2f = new Matrix2f();
-        matrix2f.scale(SCALE);
+        final int base = Math.min(contextSimpleBuffer.context().scaledHeight(), contextSimpleBuffer.context().scaledWidth());
+        matrix2f.scale(base * 0.4f / DEFAULT_RADIUS); // TODO: auto calc scale
         matrix2f.scale(-1); // rotate 180 degrees
 
         for (int symbol = 0; symbol < symbolCount; symbol++) {
