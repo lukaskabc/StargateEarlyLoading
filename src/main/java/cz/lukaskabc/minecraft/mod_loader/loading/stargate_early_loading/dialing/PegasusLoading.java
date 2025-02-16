@@ -6,8 +6,8 @@ import net.neoforged.fml.loading.progress.ProgressMeter;
 import java.util.List;
 
 public class PegasusLoading extends PegasusLoop {
-    public PegasusLoading(GenericStargate stargate) {
-        super(stargate);
+    public PegasusLoading(GenericStargate stargate, List<Integer> chevronOrder) {
+        super(stargate, chevronOrder);
     }
 
     @Override

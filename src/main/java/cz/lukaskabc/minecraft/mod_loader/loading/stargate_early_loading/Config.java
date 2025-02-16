@@ -1,11 +1,13 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import java.util.List;
 import java.util.Map;
 
 public class Config {
     private AllowedVariants variants = new AllowedVariants();
     private Map<String, Symbols> symbols = Map.of();
     private String[] backgrounds = new String[0];
+    private List<Integer> chevronOrder = List.of(1, 2, 3, 4, 5, 6, 7, 8);
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
@@ -70,6 +72,14 @@ public class Config {
 
     public void setBackgrounds(String[] backgrounds) {
         this.backgrounds = backgrounds;
+    }
+
+    public List<Integer> getChevronOrder() {
+        return chevronOrder;
+    }
+
+    public void setChevronOrder(List<Integer> chevronOrder) {
+        this.chevronOrder = chevronOrder;
     }
 
     // endregion

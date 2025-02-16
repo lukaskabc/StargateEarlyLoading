@@ -2,11 +2,13 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 
-public class MilkyWay3Step extends MilkyWay2Step {
+import java.util.List;
+
+public class MilkyWay3Step extends DialingStrategy {
     private static final int ENCODE_DELAY_HALF = ENCODE_DELAY / 2;
 
-    public MilkyWay3Step(GenericStargate stargate) {
-        super(stargate);
+    public MilkyWay3Step(GenericStargate stargate, List<Integer> chevronOrder) {
+        super(stargate, chevronOrder);
     }
 
     @Override

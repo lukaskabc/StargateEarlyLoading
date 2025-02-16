@@ -1,6 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
 import net.neoforged.fml.loading.progress.ProgressMeter;
 
 import java.util.*;
@@ -24,9 +25,22 @@ public abstract class DialingStrategy {
     public static final float MINECRAFT_CHEVRONS = NUMBER_OF_CHEVRONS - EARLY_CHEVRONS;
     protected final GenericStargate stargate;
     protected final SortedMap<Integer, Runnable> toExecute = new TreeMap<>();
+    protected final List<Integer> chevronOrder;
+    protected int lastFrameExec = 0;
+    protected int lastChevron = 1;
 
-    protected DialingStrategy(GenericStargate stargate) {
+    protected DialingStrategy(GenericStargate stargate, List<Integer> chevronOrder) {
         this.stargate = stargate;
+        ensureChevronOrderValid(chevronOrder);
+        this.chevronOrder = chevronOrder;
+    }
+
+    protected static void ensureChevronOrderValid(List<Integer> chevronOrder) {
+        final List<Integer> def = List.of(1, 2, 3, 4, 5, 6, 7, 8);
+        if (chevronOrder.size() == def.size() && new HashSet<>(chevronOrder).containsAll(def)) {
+            return; // all ok
+        }
+        throw new InitializationException("Invalid configuration of chevron order: " + chevronOrder + " the order must contain exactly 8 unique numbers from range [1; 8]");
     }
 
     private final Set<String> earlyLabels = new HashSet<>();
@@ -65,9 +79,25 @@ public abstract class DialingStrategy {
         while (!toExecute.isEmpty() && toExecute.firstKey() <= frameNumber) {
             toExecute.remove(toExecute.firstKey()).run();
         }
+        progressChevron(progressMeters, frameNumber);
+    }
+
+    protected void progressChevron(List<ProgressMeter> progressMeters, int frameNumber) {
+        final float earlyProgress = earlyProgress(progressMeters);
+        final float minecraftProgress = getMinecraftProgress(progressMeters);
+
+        for (int chevron = lastChevron; chevron <= NUMBER_OF_CHEVRONS; chevron++) {
+            final boolean shouldEncodeEarly = chevron / EARLY_CHEVRONS <= earlyProgress;
+            final boolean shouldEncodeMinecraft = chevron / MINECRAFT_CHEVRONS <= minecraftProgress || minecraftProgress > 0.95f;
+            if (shouldEncodeEarly || shouldEncodeMinecraft) {
+                encodeChevron(chevron > 8 ? 0 : chevronOrder.get(chevron - 1), frameNumber);
+            }
+        }
     }
 
     protected void executeAfter(int frame, Runnable runnable) {
         toExecute.put(frame, runnable);
     }
+
+    protected abstract void encodeChevron(int chevron, int frameNumber);
 }

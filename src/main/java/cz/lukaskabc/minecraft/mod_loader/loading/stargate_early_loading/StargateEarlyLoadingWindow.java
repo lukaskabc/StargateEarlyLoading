@@ -80,7 +80,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
         elements.add(stargate.createRenderElement());
         // TODO: dialing strategy
-        elements.add(new StartupProgressBar(font, new MilkyWay3Step(stargate)).get());
+        elements.add(new StartupProgressBar(font, new MilkyWay3Step(stargate, configuration.getChevronOrder())).get());
 
         // from forge early loading:
         // top middle memory info

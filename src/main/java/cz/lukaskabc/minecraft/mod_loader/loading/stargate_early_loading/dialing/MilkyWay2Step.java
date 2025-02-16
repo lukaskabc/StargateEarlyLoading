@@ -1,36 +1,16 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
-import net.neoforged.fml.loading.progress.ProgressMeter;
 
 import java.util.List;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate.NUMBER_OF_CHEVRONS;
-
 public class MilkyWay2Step extends DialingStrategy {
-    protected int lastFrameExec = 0;
-    protected int lastChevron = 1;
 
-    public MilkyWay2Step(GenericStargate stargate) {
-        super(stargate);
+    public MilkyWay2Step(GenericStargate stargate, List<Integer> chevronOrder) {
+        super(stargate, chevronOrder);
     }
 
     @Override
-    public void updateProgress(List<ProgressMeter> progressMeters, int frameNumber) {
-        super.updateProgress(progressMeters, frameNumber);
-
-        final float earlyProgress = earlyProgress(progressMeters);
-        final float minecraftProgress = getMinecraftProgress(progressMeters);
-
-        for (int chevron = lastChevron; chevron <= NUMBER_OF_CHEVRONS; chevron++) {
-            final boolean shouldEncodeEarly = chevron / EARLY_CHEVRONS <= earlyProgress;
-            final boolean shouldEncodeMinecraft = chevron / MINECRAFT_CHEVRONS <= minecraftProgress || minecraftProgress > 0.95f;
-            if (shouldEncodeEarly || shouldEncodeMinecraft) {
-                encodeChevron(chevron > 8 ? 0 : chevron, frameNumber);
-            }
-        }
-    }
-
     protected void encodeChevron(int chevron, int frameNumber) {
         lastChevron++;
         final int finalChevron = chevron;
