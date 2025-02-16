@@ -67,10 +67,19 @@ public class StargateVariant {
     }
 
     public void raiseChevron(int chevron, GenericStargate genericStargate) {
+        if (!getStargateModel().isMovieChevronLocking() && !getStargateModel().isMoviePrimaryChevron()) {
+            chevron = 0;
+            genericStargate.setChevronEngaged(chevron, true);
+        }
+
         genericStargate.doRaiseChevron(chevron);
     }
 
     public void lowerChevron(int chevron, GenericStargate genericStargate) {
+        if (!getStargateModel().isMovieChevronLocking() && !getStargateModel().isMoviePrimaryChevron() && chevron != 0) {
+            chevron = 0;
+            genericStargate.setChevronEngaged(chevron, false);
+        }
         genericStargate.doLowerChevron(chevron);
     }
     // endregion
