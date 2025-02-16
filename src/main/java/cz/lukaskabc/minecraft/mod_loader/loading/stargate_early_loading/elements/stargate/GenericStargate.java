@@ -48,11 +48,9 @@ public abstract class GenericStargate {
     protected static final float STARGATE_RING_START_RADIUS = DEFAULT_RADIUS - 13F / 16;
     protected static final float STARGATE_RING_START_LENGTH = SGJourneyModel.getUsedWidth(DEFAULT_SIDES, STARGATE_RING_START_RADIUS, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_START_CENTER = STARGATE_RING_START_LENGTH / 2;
-    protected static final float STARGATE_RING_CUTOUT_HEIGHT = STARGATE_RING_STOP_RADIUS - STARGATE_RING_START_RADIUS;
     protected static final float STARGATE_RING_INNER_HEIGHT = DEFAULT_RADIUS - (DEFAULT_RING_HEIGHT - STARGATE_RING_SHRINK);
     protected static final float STARGATE_RING_INNER_LENGTH = SGJourneyModel.getUsedWidth(DEFAULT_SIDES, STARGATE_RING_INNER_HEIGHT, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_INNER_CENTER = STARGATE_RING_INNER_LENGTH / 2;
-    protected static final float STARGATE_RING_HEIGHT = STARGATE_RING_OUTER_RADIUS - STARGATE_RING_INNER_HEIGHT;
     protected static final float STARGATE_CUTOUT_TO_INNER_HEIGHT = STARGATE_RING_START_RADIUS - STARGATE_RING_INNER_HEIGHT;
     protected static final float STARGATE_SYMBOL_RING_OUTER_HEIGHT = DEFAULT_RADIUS - 6F / 16;
     protected static final float STARGATE_SYMBOL_RING_INNER_HEIGHT = DEFAULT_RADIUS - 14F / 16;
@@ -180,10 +178,10 @@ public abstract class GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(texBase - 5, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(texBase - 5, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(texBase + 5, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
-        Vector2f u4 = new Vector2f(texBase + 5, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(texBase - STARGATE_RING_STOP_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(texBase + STARGATE_RING_STOP_CENTER * 16, 10.5F + STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
+        Vector2f u4 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 10.5F - STARGATE_EDGE_TO_CUTOUT_HEIGHT / 2 * 16);
 
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
