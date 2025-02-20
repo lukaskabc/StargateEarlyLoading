@@ -36,8 +36,6 @@ public abstract class GenericStargate {
     public static final int NUMBER_OF_CHEVRONS = 9;
     protected static final float CHEVRON_ANGLE = 360F / 9;
     // Ring
-    protected static final float STARGATE_RING_THICKNESS = 7F;
-    protected static final float STARGATE_RING_OFFSET = STARGATE_RING_THICKNESS / 2 / 16;
     protected static final float STARGATE_RING_OUTER_RADIUS = DEFAULT_RADIUS - STARGATE_RING_SHRINK;
     protected static final float STARGATE_RING_OUTER_LENGTH = SGJourneyModel.getUsedWidth(DEFAULT_SIDES, STARGATE_RING_OUTER_RADIUS, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_OUTER_CENTER = STARGATE_RING_OUTER_LENGTH / 2;
@@ -59,7 +57,6 @@ public abstract class GenericStargate {
     protected static final float DIVIDER_THICKNESS = 1F / 16;
     protected static final float DIVIDER_CENTER = DIVIDER_THICKNESS / 2;
     protected static final float DIVIDER_HEIGHT = 8F / 16;
-    protected static final float DIVIDER_OFFSET = 0.5F / 16;
     protected final int symbolCount;
     protected final float symbolAngle;
     protected final float stargateSymbolRingOuterLength;
