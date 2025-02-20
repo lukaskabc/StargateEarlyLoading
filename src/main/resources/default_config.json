@@ -18,6 +18,13 @@
       "sg-1"
     ]
   },
+  // fallback values for variants without an explicit dialing strategy
+  // available strategies: MilkyWay2Step, MilkyWay3Step, PegasusLoading, PegasusLoop, UniverseLoop
+  "default_dialing_strategies": {
+    "milky_way": "MilkyWay3Step",
+    "pegasus": "PegasusLoop",
+    "universe": "UniverseLoop"
+  },
   // List of symbols referenced from stargate variants
   "symbols": {
     "milky_way:terra": {

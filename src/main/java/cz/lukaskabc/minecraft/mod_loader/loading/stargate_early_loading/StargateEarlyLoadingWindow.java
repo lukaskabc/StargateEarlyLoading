@@ -1,10 +1,12 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.MilkyWay3Step;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.DialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.Background;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefEarlyFrameBuffer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
@@ -26,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +55,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final RefDisplayWindow accessor;
     private final Config configuration;
     private final GenericStargate stargate;
+    private final DialingStrategy dialingStrategy;
     private final StopWatch stopWatch = new StopWatch();
 
     public StargateEarlyLoadingWindow() {
@@ -61,6 +65,12 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
         stargate = ConfigLoader.loadStargate(configuration);
+        final StargateVariant variant = stargate.getVariant();
+        dialingStrategy = RefDialingStrategy.instance(Optional.ofNullable(variant.getDialingStrategy())
+                        .orElseGet(() -> configuration.getDefaultDialingStrategies().get(variant.getType())),
+                stargate,
+                configuration.getChevronOrder()
+        );
     }
 
     private static void checkFMLConfig() {
@@ -79,8 +89,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final SimpleFont font = accessor.getFont();
         elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
         elements.add(stargate.createRenderElement());
-        // TODO: dialing strategy
-        elements.add(new StartupProgressBar(font, new MilkyWay3Step(stargate, configuration.getChevronOrder())).get());
+        elements.add(new StartupProgressBar(font, dialingStrategy).get());
 
         // from forge early loading:
         // top middle memory info

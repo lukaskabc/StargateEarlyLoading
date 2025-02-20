@@ -389,4 +389,8 @@ public abstract class GenericStargate {
             GenericChevron.renderOuterChevronFront(bb, matrix3f, isRaised);
         }
     }
+
+    public StargateVariant getVariant() {
+        return variant;
+    }
 }

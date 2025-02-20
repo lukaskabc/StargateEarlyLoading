@@ -97,13 +97,13 @@ public class ConfigLoader {
      */
     public static GenericStargate loadStargate(Config configuration) {
         final StargateType type = Helper.randomElement(findAvailableTypes(configuration));
+        if (type == null) {
+            throw new InitializationException("Stargate type is null");
+        }
         final String[] variants = switch (type) {
             case MILKY_WAY -> configuration.getVariants().getMilkyWay();
             case PEGASUS -> configuration.getVariants().getPegasus();
             case UNIVERSE -> configuration.getVariants().getUniverse();
-            default -> {
-                throw new InitializationException("Unsupported stargate type: " + type);
-            }
         };
         final String variant = Helper.randomElement(variants);
         final StargateVariant stargateVariant = loadStargateVariant(type, variant);

@@ -17,6 +17,7 @@ public class StargateVariant {
     private VariantSymbols symbols = new VariantSymbols();
     @NonNull
     private VariantModel stargateModel = new VariantModel();
+    private String dialingStrategy;
 
     // region <Getters & Setters>
 
@@ -62,11 +63,11 @@ public class StargateVariant {
         this.stargateModel = stargateModel;
     }
 
-    public void engageChevron(int chevron, GenericStargate genericStargate) {
+    public void engageChevron(int chevron, @NonNull GenericStargate genericStargate) {
         genericStargate.setChevronEngaged(chevron, true);
     }
 
-    public void raiseChevron(int chevron, GenericStargate genericStargate) {
+    public void raiseChevron(int chevron, @NonNull GenericStargate genericStargate) {
         if (!getStargateModel().isMovieChevronLocking() && !getStargateModel().isMoviePrimaryChevron()) {
             chevron = 0;
             genericStargate.setChevronEngaged(chevron, true);
@@ -75,12 +76,21 @@ public class StargateVariant {
         genericStargate.doRaiseChevron(chevron);
     }
 
-    public void lowerChevron(int chevron, GenericStargate genericStargate) {
+    public void lowerChevron(int chevron, @NonNull GenericStargate genericStargate) {
         if (!getStargateModel().isMovieChevronLocking() && !getStargateModel().isMoviePrimaryChevron() && chevron != 0) {
             chevron = 0;
             genericStargate.setChevronEngaged(chevron, false);
         }
         genericStargate.doLowerChevron(chevron);
     }
+
+    public String getDialingStrategy() {
+        return dialingStrategy;
+    }
+
+    public void setDialingStrategy(String dialingStrategy) {
+        this.dialingStrategy = dialingStrategy;
+    }
+
     // endregion
 }

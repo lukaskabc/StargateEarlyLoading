@@ -1,5 +1,10 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.MilkyWay2Step;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.PegasusLoop;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.UniverseLoop;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateType;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +13,12 @@ public class Config {
     private Map<String, Symbols> symbols = Map.of();
     private String[] backgrounds = new String[0];
     private List<Integer> chevronOrder = List.of(1, 2, 3, 4, 5, 6, 7, 8);
+
+    private Map<StargateType, String> defaultDialingStrategies = Map.of(
+            StargateType.MILKY_WAY, MilkyWay2Step.class.getSimpleName(),
+            StargateType.PEGASUS, PegasusLoop.class.getSimpleName(),
+            StargateType.UNIVERSE, UniverseLoop.class.getSimpleName()
+    );
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
@@ -80,6 +91,14 @@ public class Config {
 
     public void setChevronOrder(List<Integer> chevronOrder) {
         this.chevronOrder = chevronOrder;
+    }
+
+    public Map<StargateType, String> getDefaultDialingStrategies() {
+        return defaultDialingStrategies;
+    }
+
+    public void setDefaultDialingStrategies(Map<StargateType, String> defaultDialingStrategies) {
+        this.defaultDialingStrategies = defaultDialingStrategies;
     }
 
     // endregion
