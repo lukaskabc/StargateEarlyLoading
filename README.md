@@ -52,7 +52,13 @@ If you cant launch the game, try it without the mod first to ensure you can laun
 ## Implementation
 
 For implementation details
-see [about implementation](https://github.com/lukaskabc/StargateEarlyLoading/blob/main/docs/README.md)
+see [about implementation](https://github.com/lukaskabc/StargateEarlyLoading/blob/main/docs/implementation.md)
+
+## Development
+
+This is my first mod and first interaction with Minecraft modding and NeoForge.
+I am open for objective criticism and suggestion if you have an idea how to improve the implementation.
+
 ___
 
 NOT AN OFFICIAL MINECRAFT PRODUCT/SERVICE/MOD. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
