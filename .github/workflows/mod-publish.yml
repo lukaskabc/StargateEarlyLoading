@@ -5,7 +5,8 @@ name: Automatically publish to Modrinth and CurseForge
 # The release description is used as the changelog
 on:
   release:
-    types: [published]
+    types: [ published ]
+
 jobs:
   publish-to-curseforge:
     runs-on: ubuntu-latest
@@ -22,7 +23,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 21
-          
+
       - name: Setup Gradle Caches
         uses: actions/cache@v3
         with:
@@ -33,24 +34,32 @@ jobs:
       - name: Setup Gradle Wrapper
         run: chmod +x gradlew
 
-      - name: Extract tag version
+      - name: Extract and process tag version
         id: extract_tag
-        run: echo "::set-output name=TAG::${GITHUB_REF#refs/tags/}"
-  
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Strip 'v' from version if present
+        run: |
+          if [[ "${{ env.TAG }}" == v* ]]; then
+            echo "VERSION=${{ env.TAG:1 }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${{ env.TAG }}" >> $GITHUB_ENV
+          fi
+
       - name: Set version in gradle.properties
         run: |
-          sed -i "s/^mod_version=.*/mod_version=${{ steps.extract_tag.outputs.TAG }}/" gradle.properties
+          sed -i "s/^mod_version=.*/mod_version=${{ env.VERSION }}/" gradle.properties
 
       - name: Build Release
         run: ./gradlew build
-        
+
       - name: Publish to Curseforge
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           # The unique identifier of your CurseForge project.
-          #curseforge-id: 1205356
+          curseforge-id: 1205356
           # Your CurseForge API token.
-          #curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           # Your GitHub API token.
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-prerelease: true
