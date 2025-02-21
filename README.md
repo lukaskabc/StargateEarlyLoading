@@ -5,16 +5,12 @@ Yes, including the NeoForge's **early loading** with a custom **animated** one, 
 
 **Note that this _mod_ is still not considered as stable**
 
-<details>
-    <summary>Video</summary>
-    <img alt="NeoForge early loading" src="https://github.com/lukaskabc/StargateEarlyLoading/blob/main/docs/earlyloading1.png" />
-    <br>
-    <h2>ATM10 with the custom loading</h2>
-    <p>
-        <a href=" https://www.curseforge.com/minecraft/modpacks/all-the-mods-10">All The Mods 10</a> 
-        modpack was used for demonstration of longer loading time.
-    </p>
-</details>
+![NeoForge early loading](https://github.com/lukaskabc/StargateEarlyLoading/blob/main/docs/earlyloading1.png)
+
+## Video:
+
+[Empty modpack loading (YouTube)](https://youtu.be/-zaa9cX18TU)  
+[ATM10 with the custom loading (YouTube)](https://youtu.be/ozuZtOppDks)
 
 ## Setup
 
