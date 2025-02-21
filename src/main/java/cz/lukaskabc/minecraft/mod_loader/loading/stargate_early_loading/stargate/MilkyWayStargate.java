@@ -1,8 +1,8 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate;
+package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.Config;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateType;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateType;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 
 public class MilkyWayStargate extends GenericStargate {
     public MilkyWayStargate(StargateVariant stargateVariant, Config.Symbols symbols) {

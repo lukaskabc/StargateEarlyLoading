@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
 
 import java.util.List;
 

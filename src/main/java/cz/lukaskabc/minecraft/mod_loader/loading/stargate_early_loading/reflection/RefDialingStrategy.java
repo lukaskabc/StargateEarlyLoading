@@ -1,8 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.*;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

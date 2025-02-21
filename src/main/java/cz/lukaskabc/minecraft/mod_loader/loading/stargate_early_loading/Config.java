@@ -3,7 +3,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.MilkyWay2Step;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.PegasusLoop;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.UniverseLoop;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateType;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateType;
 
 import java.util.List;
 import java.util.Map;

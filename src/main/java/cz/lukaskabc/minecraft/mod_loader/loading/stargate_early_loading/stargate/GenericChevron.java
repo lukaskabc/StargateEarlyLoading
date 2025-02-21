@@ -1,4 +1,4 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate;
+package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import org.joml.Matrix3f;

@@ -1,12 +1,12 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
 import net.neoforged.fml.loading.progress.ProgressMeter;
 
 import java.util.*;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate.NUMBER_OF_CHEVRONS;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate.NUMBER_OF_CHEVRONS;
 
 public abstract class DialingStrategy {
     protected static final Set<String> EARLY_LABELS = Set.of(

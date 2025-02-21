@@ -1,6 +1,6 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant;
+package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullUnmarked;
 

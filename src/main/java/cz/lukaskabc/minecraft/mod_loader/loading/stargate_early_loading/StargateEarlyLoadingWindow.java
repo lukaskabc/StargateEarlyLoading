@@ -4,11 +4,11 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.Background;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.GenericStargate;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefEarlyFrameBuffer;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper;
 import net.neoforged.fml.earlydisplay.ColourScheme;
