@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Config {
+    private boolean crashAfterLoad = false;
     private AllowedVariants variants = new AllowedVariants();
     private Map<String, Symbols> symbols = Map.of();
     private String[] backgrounds = new String[0];
@@ -101,5 +102,12 @@ public class Config {
         this.defaultDialingStrategies = defaultDialingStrategies;
     }
 
+    public boolean doCrashAfterLoad() {
+        return crashAfterLoad;
+    }
+
+    public void setCrashAfterLoad(boolean crashAfterLoad) {
+        this.crashAfterLoad = crashAfterLoad;
+    }
     // endregion
 }
