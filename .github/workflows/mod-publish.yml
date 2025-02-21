@@ -33,6 +33,14 @@ jobs:
       - name: Setup Gradle Wrapper
         run: chmod +x gradlew
 
+      - name: Extract tag version
+        id: extract_tag
+        run: echo "::set-output name=TAG::${GITHUB_REF#refs/tags/}"
+  
+      - name: Set version in gradle.properties
+        run: |
+          sed -i "s/^mod_version=.*/mod_version=${{ steps.extract_tag.outputs.TAG }}/" gradle.properties
+
       - name: Build Release
         run: ./gradlew build
         
@@ -40,9 +48,9 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           # The unique identifier of your CurseForge project.
-          curseforge-id: 1205356
+          #curseforge-id: 1205356
           # Your CurseForge API token.
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          #curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           # Your GitHub API token.
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-prerelease: true
