@@ -17,9 +17,10 @@
       "promo",
       "sg-1"
     ]
+    // do not add pegasus and universe stargates (not implemented yet)
   },
   // fallback values for variants without an explicit dialing strategy
-  // available strategies: MilkyWay2Step, MilkyWay3Step, PegasusLoading, PegasusLoop, UniverseLoop
+  // available strategies: MilkyWay2Step, MilkyWay3Step, other strategies are not implemented yet!
   "default_dialing_strategies": {
     "milky_way": "MilkyWay3Step",
     "pegasus": "PegasusLoop",
@@ -67,4 +68,6 @@
     7,
     8
   ]
+  // alternatively you can use
+  // "chevron_order": [1, 2, 3, 6, 7, 8, 4, 5]
 }
