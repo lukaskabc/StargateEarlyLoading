@@ -19,6 +19,8 @@ How to install the _mod_
 1. Place the jar in the `mods` directory.
 2. Go to `config/fml.toml` and set:
 
+**Note that resizing the window during loading is not supported.**
+
 ```toml
 earlyWindowControl = true
 earlyWindowProvider = "StargateEarlyLoading"
@@ -29,6 +31,14 @@ earlyWindowMaximized = true
 
 3. **Optionally** install `DelayedLoadingOverlay`, which will extend the game loading until the stargate animation is
    finished.
+
+If you dont want the window to maximize at start, but you also want higher resolution
+(possibly after maximizing the window manually), you can try
+
+```toml
+earlyWindowFBScale = 2
+earlyWindowMaximized = false
+```
 
 ## Customization
 

@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.getGlobalAlpha;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo.LOGO_NEGATIVE_HEIGHT_OFFSET;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo.LOGO_WIDTH;
 import static java.lang.Math.clamp;
 
 public class StartupProgressBar extends ProgressBar implements Supplier<RenderElement> {
@@ -54,18 +56,20 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
     }
 
     private void renderBar(final ContextSimpleBuffer bb, final int frame, int cnt, ProgressMeter pm) {
-        final int barSpacing = lineSpacing - descent + BAR_HEIGHT;
-        final int y = bb.context().scaledHeight() / 2 + cnt * barSpacing + 16 + MEMORY_BAR_HEIGHT;
+        final RenderElement.DisplayContext ctx = bb.context();
+        final int barSpacing = (lineSpacing - descent + BAR_HEIGHT) * ctx.scale();
+        final int mojangLogoHeight = ctx.scale() * ((LOGO_WIDTH / 2) - LOGO_NEGATIVE_HEIGHT_OFFSET);
+        final int y = ctx.scaledHeight() / 2 + cnt * barSpacing + MEMORY_BAR_HEIGHT + mojangLogoHeight;
         final int alpha = 0xFF;
         final int colour = ColourScheme.BLACK.foreground().packedint(alpha);
         TextureRenderer textureRenderer;
         if (pm.steps() == 0) {
-            textureRenderer = progressBar(ctx -> new int[]{(ctx.scaledWidth() - BAR_WIDTH * ctx.scale()) / 2, y + lineSpacing - descent, BAR_WIDTH * ctx.scale()}, f -> colour, f -> indeterminateBar(f, cnt == 0));
+            textureRenderer = progressBar(ct -> new int[]{(ct.scaledWidth() - BAR_WIDTH * ct.scale()) / 2, y + lineSpacing - descent, BAR_WIDTH * ct.scale()}, f -> colour, f -> indeterminateBar(f, cnt == 0));
         } else {
-            textureRenderer = progressBar(ctx -> new int[]{(ctx.scaledWidth() - BAR_WIDTH * ctx.scale()) / 2, y + lineSpacing - descent, BAR_WIDTH * ctx.scale()}, f -> colour, f -> new float[]{0f, pm.progress()});
+            textureRenderer = progressBar(ct -> new int[]{(ct.scaledWidth() - BAR_WIDTH * ct.scale()) / 2, y + lineSpacing - descent, BAR_WIDTH * ct.scale()}, f -> colour, f -> new float[]{0f, pm.progress()});
         }
         textureRenderer.accept(bb, frame);
-        renderText(text((bb.context().scaledWidth() - BAR_WIDTH * bb.context().scale()) / 2, y, pm.label().getText(), colour), bb);
+        renderText(text((ctx.scaledWidth() - BAR_WIDTH * ctx.scale()) / 2, y, pm.label().getText(), colour), bb);
     }
 
     private static float[] indeterminateBar(int frame, boolean isActive) {

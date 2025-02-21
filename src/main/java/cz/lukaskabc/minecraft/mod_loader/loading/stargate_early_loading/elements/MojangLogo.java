@@ -10,6 +10,8 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 
 public class MojangLogo implements Supplier<RenderElement> {
+    public static final int LOGO_WIDTH = 256;
+    public static final int LOGO_NEGATIVE_HEIGHT_OFFSET = 64 + 16;
     private final int textureId;
     private final int frameStart;
 
@@ -22,10 +24,10 @@ public class MojangLogo implements Supplier<RenderElement> {
     public RenderElement get() {
         return RefRenderElement.constructor((bb, frame) -> {
             final RenderElement.DisplayContext ctx = bb.context();
-            final int logoWidth = 256 * ctx.scale();
+            final int logoWidth = LOGO_WIDTH * ctx.scale();
             final int logoHeight = logoWidth / 2;
             final float x0 = (ctx.scaledWidth() - logoWidth * 2) / 2f;
-            final float y0 = (ctx.scaledHeight() - logoHeight) / 2f - 64 + MEMORY_BAR_HEIGHT;
+            final float y0 = (ctx.scaledHeight() - logoHeight) / 2f - LOGO_NEGATIVE_HEIGHT_OFFSET + MEMORY_BAR_HEIGHT;
             ctx.elementShader().updateTextureUniform(0);
             ctx.elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
             final int fade = Math.min((frame - frameStart) * 10, 255);
