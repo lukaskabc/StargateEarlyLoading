@@ -36,19 +36,16 @@ jobs:
 
       - name: Extract and process tag version
         id: extract_tag
-        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - name: Strip 'v' from version if present
         run: |
-          if [[ "${{ env.TAG }}" == v* ]]; then
-            echo "VERSION=${{ env.TAG:1 }}" >> $GITHUB_ENV
-          else
-            echo "VERSION=${{ env.TAG }}" >> $GITHUB_ENV
+          TAG=${GITHUB_REF#refs/tags/}
+          if [[ "$TAG" == v* ]]; then
+            TAG=${TAG:1}
           fi
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Set version in gradle.properties
         run: |
-          sed -i "s/^mod_version=.*/mod_version=${{ env.VERSION }}/" gradle.properties
+          sed -i "s/^mod_version=.*/mod_version=${{ env.TAG }}/" gradle.properties
 
       - name: Build Release
         run: ./gradlew build
