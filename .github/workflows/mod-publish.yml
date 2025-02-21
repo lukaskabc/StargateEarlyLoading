@@ -65,5 +65,5 @@ jobs:
             [1.21,1.21.4]
           game-version-filter: none
         # An array of Java versions compatible with your project.
-        java: 
-        - 21
+        java: |
+          21
