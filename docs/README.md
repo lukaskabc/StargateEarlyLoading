@@ -5,6 +5,9 @@ from resourcepacks made for StargateJourney.
 
 **But a small edit is needed.**
 
+In the [first release on CurseForge](https://www.curseforge.com/minecraft/mc-mods/stargate-early-loading/files/6218429/additional-files)
+, there are StargateJourney: Refreshed and MoreGates addon ported as examples.
+
 ## Missing features
 
 Some features are not yet implemented.
