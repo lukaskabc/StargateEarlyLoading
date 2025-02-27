@@ -162,7 +162,7 @@ public abstract class GenericStargate {
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
-    protected static void renderOuterRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
+    protected void renderOuterRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
         final float texBase = 10F * (j % 4) + 5;
 
         Vector2f v1 = new Vector2f(-STARGATE_RING_OUTER_CENTER, STARGATE_RING_OUTER_RADIUS);
@@ -183,7 +183,7 @@ public abstract class GenericStargate {
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
-    private void initRender(ContextSimpleBuffer contextSimpleBuffer) {
+    protected static void initRender(ContextSimpleBuffer contextSimpleBuffer) {
         contextSimpleBuffer.context().elementShader().updateTextureUniform(STARGATE_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
         contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
@@ -192,31 +192,41 @@ public abstract class GenericStargate {
 
     public void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
         initRender(contextSimpleBuffer);
-        final float rotation = ((frame / 5f) % 360) / 156f * 360F;
 
         Matrix2f matrix2f = new Matrix2f();
         final int base = Math.min(contextSimpleBuffer.context().scaledHeight(), contextSimpleBuffer.context().scaledWidth());
         matrix2f.scale(base * 0.4f / DEFAULT_RADIUS); // TODO: auto calc scale
         matrix2f.scale(-1); // rotate 180 degrees
 
+        renderGate(contextSimpleBuffer, frame, matrix2f);
+
+        contextSimpleBuffer.simpleBufferBuilder().draw();
+    }
+
+    protected void renderSymbols(ContextSimpleBuffer contextSimpleBuffer, Matrix2f matrix2f, float rotation) {
         for (int symbol = 0; symbol < symbolCount; symbol++) {
             renderSymbolRingSegment(contextSimpleBuffer, matrix2f, symbol, rotation);
         }
-
         // second loop required for depth handling
         for (int symbol = 0; symbol < symbolCount; symbol++) {
             renderSymbolDivider(contextSimpleBuffer, matrix2f, symbol, rotation);
         }
+    }
 
+    protected void renderRing(ContextSimpleBuffer contextSimpleBuffer, Matrix2f matrix2f, float rotation) {
         for (int j = 0; j < DEFAULT_SIDES; j++) {
             Matrix2f m = new Matrix2f(matrix2f);
             m.rotate(j * -DEFAULT_ANGLE * 0.017453292F);
             renderOuterRing(contextSimpleBuffer, m, j);
             renderInnerRing(contextSimpleBuffer, m, j);
         }
+    }
 
+    protected void renderGate(ContextSimpleBuffer contextSimpleBuffer, int frame, Matrix2f matrix2f) {
+        final float rotation = ((frame / 5f) % 360) / 156f * 360F;
+        renderSymbols(contextSimpleBuffer, matrix2f, rotation);
+        renderRing(contextSimpleBuffer, matrix2f, rotation);
         renderChevrons(contextSimpleBuffer, matrix2f);
-        contextSimpleBuffer.simpleBufferBuilder().draw();
     }
 
     protected void renderSymbolDivider(ContextSimpleBuffer bb, Matrix2f m, int j, float rotation) {
@@ -264,7 +274,7 @@ public abstract class GenericStargate {
         renderSymbol(bb, matrix2f, symbol);
     }
 
-    private void renderChevrons(ContextSimpleBuffer bb, Matrix2f matrix2f) {
+    protected void renderChevrons(ContextSimpleBuffer bb, Matrix2f matrix2f) {
         renderPrimaryChevron(bb, matrix2f);
         for (int chevron = 1; chevron < NUMBER_OF_CHEVRONS; chevron++) {
             renderChevron(bb, matrix2f, chevron);
