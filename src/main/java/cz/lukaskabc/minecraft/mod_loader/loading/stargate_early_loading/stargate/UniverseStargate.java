@@ -134,7 +134,8 @@ public class UniverseStargate extends GenericStargate {
     protected void renderChevron(ContextSimpleBuffer bb, Matrix2f matrix2f, int chevron) {
         Matrix3f m = new Matrix3f(matrix2f);
         m.rotate(new Quaternionf().rotationZ(toRadians(CHEVRON_ANGLE * chevron/* + rotation*/)));
-        translate(m, 0, DEFAULT_RADIUS - (5.5f / 16));
+        // * 3.35f I have no idea why this is needed any why chevrons are not positioned correctly otherwise
+        translate(m, 0, DEFAULT_RADIUS * 3.35f - (5.5f / 16));
         UniverseChevron.renderChevron(bb, m);
     }
 

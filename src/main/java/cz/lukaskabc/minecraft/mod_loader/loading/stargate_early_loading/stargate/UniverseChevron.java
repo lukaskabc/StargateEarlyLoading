@@ -7,6 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.translate;
 
 public class UniverseChevron {
     protected static final float STARGATE_RING_FRONT_THICKNESS = 3F;
@@ -39,6 +40,9 @@ public class UniverseChevron {
         renderChevronLight1(bb, matrix3f);
         renderChevronLight2(bb, matrix3f);
         renderChevronLight3(bb, matrix3f);
+
+        // I have no idea why this is needed any why chevrons are not positioned correctly otherwise
+        translate(matrix3f, 0, 1.35f);
 
         // Left 1
         renderLightStrip(bb, matrix3f,
