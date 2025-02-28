@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.toRadians;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.translate;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 public abstract class GenericStargate {
@@ -375,12 +376,6 @@ public abstract class GenericStargate {
             renderSingleSymbol(bb, matrix2f, symbol, symbols.getTextureOffset(symbol), symbols.size());
         }
         useStargateTexture(bb);
-    }
-
-    public void translate(Matrix3f matrix3f, float x, float y) {
-        matrix3f.m20 += matrix3f.m00 * x + matrix3f.m10 * y;
-        matrix3f.m21 += matrix3f.m01 * x + matrix3f.m11 * y;
-        matrix3f.m22 += matrix3f.m02 * x + matrix3f.m12 * y;
     }
 
     protected void renderPrimaryChevron(ContextSimpleBuffer bb, Matrix2f matrix2f) {

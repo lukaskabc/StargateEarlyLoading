@@ -6,10 +6,13 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import org.joml.Matrix2f;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
 import org.joml.Vector2f;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.toRadians;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.translate;
 
 public class UniverseStargate extends GenericStargate {
     protected static final int UNIVERSE_SIDES = 54;
@@ -23,10 +26,6 @@ public class UniverseStargate extends GenericStargate {
     protected static final float STARGATE_SYMBOL_RING_INNER_LENGTH = SGJourneyModel.getUsedWidth(UNIVERSE_SIDES, STARGATE_SYMBOL_RING_INNER_HEIGHT, DEFAULT_RADIUS);
     protected static final float STARGATE_SYMBOL_RING_INNER_CENTER = STARGATE_SYMBOL_RING_INNER_LENGTH / 2;
 
-    protected static final float STARGATE_RING_FRONT_THICKNESS = 3F;
-    protected static final float STARGATE_RING_BACK_THICKNESS = 4F;
-    protected static final float STARGATE_RING_OFFSET = (STARGATE_RING_FRONT_THICKNESS + STARGATE_RING_BACK_THICKNESS) / 2 / 16;
-
     protected static final float STARGATE_RING_OUTER_RADIUS = DEFAULT_RADIUS - STARGATE_RING_SHRINK;
     protected static final float STARGATE_RING_OUTER_LENGTH = SGJourneyModel.getUsedWidth(UNIVERSE_SIDES, STARGATE_RING_OUTER_RADIUS, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_OUTER_CENTER = STARGATE_RING_OUTER_LENGTH / 2;
@@ -37,30 +36,8 @@ public class UniverseStargate extends GenericStargate {
 
     protected static final float STARGATE_RING_HEIGHT = STARGATE_RING_OUTER_RADIUS - STARGATE_RING_INNER_HEIGHT;
 
-    protected static final float CHEVRON_LIGHT_THICKNESS = 1F / 16;
-    protected static final float CHEVRON_LIGHT_Z_OFFSET = STARGATE_RING_OFFSET + CHEVRON_LIGHT_THICKNESS;
-
-    protected static final float CHEVRON_LIGHT_TOP_LENGTH = 4F / 16;
-    protected static final float CHEVRON_LIGHT_TOP_CENTER = CHEVRON_LIGHT_TOP_LENGTH / 2;
-    protected static final float CHEVRON_LIGHT_TOP_HEIGHT = 5F / 16;
-
-    protected static final float CHEVRON_LIGHT_MID1_LENGTH = 6F / 16;
-    protected static final float CHEVRON_LIGHT_MID1_CENTER = CHEVRON_LIGHT_MID1_LENGTH / 2;
-    protected static final float CHEVRON_LIGHT_MID1_HEIGHT = 4F / 16;
-
-    protected static final float CHEVRON_LIGHT_MID2_LENGTH = 3F / 16;
-    protected static final float CHEVRON_LIGHT_MID2_CENTER = CHEVRON_LIGHT_MID2_LENGTH / 2;
-    protected static final float CHEVRON_LIGHT_MID2_HEIGHT = 2F / 16;
-
-    protected static final float CHEVRON_LIGHT_BOTTOM_LENGTH = 1F / 16;
-    protected static final float CHEVRON_LIGHT_BOTTOM_CENTER = CHEVRON_LIGHT_BOTTOM_LENGTH / 2;
-    protected static final float CHEVRON_LIGHT_BOTTOM_HEIGHT = 0;
-
-    protected static final float OUTER_CHEVRON_THICKNESS = 0.5F / 16;
-    protected static final float OUTER_CHEVRON_Z_OFFSET = STARGATE_RING_OFFSET + OUTER_CHEVRON_THICKNESS;
-
-    public static final int MAX_ROTATION = 54 * 3;
-    public static final int ANGLE = MAX_ROTATION / 54;
+    public static final int MAX_ROTATION = UNIVERSE_SIDES * 3;
+    public static final int ANGLE = MAX_ROTATION / UNIVERSE_SIDES;
     public static final int ROTATION_THIRD = MAX_ROTATION / 3;
     public static final int RESET_DEGREES = ROTATION_THIRD * 2;
 
@@ -74,7 +51,7 @@ public class UniverseStargate extends GenericStargate {
 
     @Override
     protected void renderGate(ContextSimpleBuffer contextSimpleBuffer, int frame, Matrix2f matrix2f) {
-        final float rotation = ((frame / 5f) % 360) / 156f * 360F;
+        final float rotation = 0;//((frame / 5f) % 360) / 156f * 360F;
         renderRing(contextSimpleBuffer, matrix2f, rotation);
         renderSymbols(contextSimpleBuffer, matrix2f, rotation);
         renderChevrons(contextSimpleBuffer, matrix2f);
@@ -147,4 +124,18 @@ public class UniverseStargate extends GenericStargate {
         // TODO: engaged symbols
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, variant.getSymbols().getSymbolColor().packedColor());
     }
+
+    @Override
+    protected void renderPrimaryChevron(ContextSimpleBuffer bb, Matrix2f matrix2f) {
+        this.renderChevron(bb, matrix2f, 0);
+    }
+
+    @Override
+    protected void renderChevron(ContextSimpleBuffer bb, Matrix2f matrix2f, int chevron) {
+        Matrix3f m = new Matrix3f(matrix2f);
+        m.rotate(new Quaternionf().rotationZ(toRadians(CHEVRON_ANGLE * chevron/* + rotation*/)));
+        translate(m, 0, DEFAULT_RADIUS - (5.5f / 16));
+        UniverseChevron.renderChevron(bb, m);
+    }
+
 }
