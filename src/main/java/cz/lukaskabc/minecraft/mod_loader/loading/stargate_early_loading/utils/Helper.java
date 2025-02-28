@@ -15,6 +15,10 @@ public class Helper {
         return array[random.nextInt(array.length)];
     }
 
+    public static float toRadians(float degrees) {
+        return (float) Math.toRadians(degrees);
+    }
+
     private Helper() {
         throw new AssertionError();
     }

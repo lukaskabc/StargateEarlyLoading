@@ -9,6 +9,7 @@ import org.joml.Matrix2f;
 import org.joml.Vector2f;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.toRadians;
 
 public class UniverseStargate extends GenericStargate {
     protected static final int UNIVERSE_SIDES = 54;
@@ -25,23 +26,16 @@ public class UniverseStargate extends GenericStargate {
     protected static final float STARGATE_RING_FRONT_THICKNESS = 3F;
     protected static final float STARGATE_RING_BACK_THICKNESS = 4F;
     protected static final float STARGATE_RING_OFFSET = (STARGATE_RING_FRONT_THICKNESS + STARGATE_RING_BACK_THICKNESS) / 2 / 16;
-    protected static final float STARGATE_RING_DIVIDE_OFFSET = (STARGATE_RING_BACK_THICKNESS - STARGATE_RING_FRONT_THICKNESS) / 2 / 16;
-    protected static final float SYMBOL_OFFSET = STARGATE_RING_OFFSET + 0.001F;
 
     protected static final float STARGATE_RING_OUTER_RADIUS = DEFAULT_RADIUS - STARGATE_RING_SHRINK;
     protected static final float STARGATE_RING_OUTER_LENGTH = SGJourneyModel.getUsedWidth(UNIVERSE_SIDES, STARGATE_RING_OUTER_RADIUS, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_OUTER_CENTER = STARGATE_RING_OUTER_LENGTH / 2;
-
-    protected static final float STARGATE_RING_STOP_RADIUS = DEFAULT_RADIUS - 7F / 16;
-    protected static final float STARGATE_RING_STOP_LENGTH = SGJourneyModel.getUsedWidth(UNIVERSE_SIDES, STARGATE_RING_STOP_RADIUS, DEFAULT_RADIUS);
-    protected static final float STARGATE_RING_STOP_CENTER = STARGATE_RING_STOP_LENGTH / 2;
 
     protected static final float STARGATE_RING_INNER_HEIGHT = DEFAULT_RADIUS - (DEFAULT_RING_HEIGHT - STARGATE_RING_SHRINK);
     protected static final float STARGATE_RING_INNER_LENGTH = SGJourneyModel.getUsedWidth(UNIVERSE_SIDES, STARGATE_RING_INNER_HEIGHT, DEFAULT_RADIUS);
     protected static final float STARGATE_RING_INNER_CENTER = STARGATE_RING_INNER_LENGTH / 2;
 
     protected static final float STARGATE_RING_HEIGHT = STARGATE_RING_OUTER_RADIUS - STARGATE_RING_INNER_HEIGHT;
-    protected static final float STARGATE_SYMBOL_RING_HEIGHT = STARGATE_SYMBOL_RING_OUTER_HEIGHT - STARGATE_SYMBOL_RING_INNER_HEIGHT;
 
     protected static final float CHEVRON_LIGHT_THICKNESS = 1F / 16;
     protected static final float CHEVRON_LIGHT_Z_OFFSET = STARGATE_RING_OFFSET + CHEVRON_LIGHT_THICKNESS;
@@ -65,10 +59,10 @@ public class UniverseStargate extends GenericStargate {
     protected static final float OUTER_CHEVRON_THICKNESS = 0.5F / 16;
     protected static final float OUTER_CHEVRON_Z_OFFSET = STARGATE_RING_OFFSET + OUTER_CHEVRON_THICKNESS;
 
-    private float rotation = 0.0F;
-
-    protected static final float DEFAULT_DISTANCE_FROM_CENTER = 56.0F;
-    protected static final int BOXES_PER_RING = 36;
+    public static final int MAX_ROTATION = 54 * 3;
+    public static final int ANGLE = MAX_ROTATION / 54;
+    public static final int ROTATION_THIRD = MAX_ROTATION / 3;
+    public static final int RESET_DEGREES = ROTATION_THIRD * 2;
 
     public UniverseStargate(StargateVariant stargateVariant, Config.Symbols symbols) {
         super((short) 36, stargateVariant, symbols);
@@ -79,16 +73,34 @@ public class UniverseStargate extends GenericStargate {
     }
 
     @Override
+    protected void renderGate(ContextSimpleBuffer contextSimpleBuffer, int frame, Matrix2f matrix2f) {
+        final float rotation = ((frame / 5f) % 360) / 156f * 360F;
+        renderRing(contextSimpleBuffer, matrix2f, rotation);
+        renderSymbols(contextSimpleBuffer, matrix2f, rotation);
+        renderChevrons(contextSimpleBuffer, matrix2f);
+    }
+
+    @Override
     protected void renderRing(ContextSimpleBuffer contextSimpleBuffer, Matrix2f matrix2f, float rotation) {
+        Matrix2f m = new Matrix2f(matrix2f);
+        m.rotate(toRadians(rotation - UNIVERSE_ANGLE / 2));
         for (int j = 0; j < UNIVERSE_SIDES; j++) {
-            Matrix2f m = new Matrix2f(matrix2f);
-            m.rotate(j * -UNIVERSE_ANGLE * 0.017453292F);
-            renderOuterRing(contextSimpleBuffer, m, j);
-            renderInnerRing(contextSimpleBuffer, m, j);
+            renderUniverseRing(contextSimpleBuffer, m, j);
+            m.rotate(toRadians(UNIVERSE_ANGLE));
         }
     }
 
-    protected void renderOuterRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
+    @Override
+    protected void renderSymbols(ContextSimpleBuffer contextSimpleBuffer, Matrix2f matrix2f, float rotation) {
+        // the matrix object is reused for each ring segment & symbol
+        Matrix2f m = new Matrix2f(matrix2f);
+        m.rotate((float) Math.toRadians(rotation));
+        for (int symbol = 0; symbol < symbolCount; symbol++) {
+            renderSymbol(contextSimpleBuffer, m, symbol);
+        }
+    }
+
+    protected void renderUniverseRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
         final float texBase = 8F * (j % 6) + 4;
 
         Vector2f v1 = new Vector2f(-STARGATE_RING_OUTER_CENTER, STARGATE_RING_OUTER_RADIUS);
@@ -101,11 +113,38 @@ public class UniverseStargate extends GenericStargate {
         matrix2f.transform(v3);
         matrix2f.transform(v4);
 
-        Vector2f u1 = new Vector2f(texBase - STARGATE_RING_OUTER_CENTER * 16, 15F - STARGATE_RING_HEIGHT / 2 * 16);
-        Vector2f u2 = new Vector2f(texBase - STARGATE_RING_INNER_CENTER * 16, 15F + STARGATE_RING_HEIGHT / 2 * 16);
-        Vector2f u3 = new Vector2f(texBase + STARGATE_RING_INNER_CENTER * 16, 15F + STARGATE_RING_HEIGHT / 2 * 16);
-        Vector2f u4 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 15F - STARGATE_RING_HEIGHT / 2 * 16);
+        Vector2f u1 = new Vector2f(texBase + STARGATE_RING_OUTER_CENTER * 16, 15F - STARGATE_RING_HEIGHT / 2 * 16);
+        Vector2f u2 = new Vector2f(texBase + STARGATE_RING_INNER_CENTER * 16, 15F + STARGATE_RING_HEIGHT / 2 * 16);
+        Vector2f u3 = new Vector2f(texBase - STARGATE_RING_INNER_CENTER * 16, 15F + STARGATE_RING_HEIGHT / 2 * 16);
+        Vector2f u4 = new Vector2f(texBase - STARGATE_RING_OUTER_CENTER * 16, 15F - STARGATE_RING_HEIGHT / 2 * 16);
 
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
+    }
+
+    @Override
+    protected void renderSingleSymbol(ContextSimpleBuffer bb, Matrix2f matrix2f, int symbolNumber, float symbolOffset, int textureXSize) {
+        final int symbolRow = symbolNumber / 4;
+        final int symbolInRow = symbolNumber % 4;
+
+        final Matrix2f m = new Matrix2f(matrix2f);
+        m.rotate(toRadians((-UNIVERSE_ANGLE * 3 / 2) + (symbolRow * -CHEVRON_ANGLE) + (symbolInRow * -UNIVERSE_ANGLE)));
+
+        Vector2f v1 = new Vector2f(-STARGATE_SYMBOL_RING_OUTER_CENTER, STARGATE_SYMBOL_RING_OUTER_HEIGHT);
+        Vector2f v2 = new Vector2f(-STARGATE_SYMBOL_RING_INNER_CENTER, STARGATE_SYMBOL_RING_INNER_HEIGHT);
+        Vector2f v3 = new Vector2f(STARGATE_SYMBOL_RING_INNER_CENTER, STARGATE_SYMBOL_RING_INNER_HEIGHT);
+        Vector2f v4 = new Vector2f(STARGATE_SYMBOL_RING_OUTER_CENTER, STARGATE_SYMBOL_RING_OUTER_HEIGHT);
+
+        m.transform(v1);
+        m.transform(v2);
+        m.transform(v3);
+        m.transform(v4);
+
+        Vector2f u1 = new Vector2f((symbolOffset - (STARGATE_SYMBOL_RING_OUTER_CENTER * 32 / 16 / textureXSize)) * 64, 0);
+        Vector2f u2 = new Vector2f((symbolOffset - (STARGATE_SYMBOL_RING_INNER_CENTER * 32 / 16 / textureXSize)) * 64, 64);
+        Vector2f u3 = new Vector2f((symbolOffset + (STARGATE_SYMBOL_RING_INNER_CENTER * 32 / 16 / textureXSize)) * 64, 64);
+        Vector2f u4 = new Vector2f((symbolOffset + (STARGATE_SYMBOL_RING_OUTER_CENTER * 32 / 16 / textureXSize)) * 64, 0);
+
+        // TODO: engaged symbols
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, variant.getSymbols().getSymbolColor().packedColor());
     }
 }
