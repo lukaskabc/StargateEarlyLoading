@@ -51,7 +51,8 @@ public class UniverseStargate extends GenericStargate {
 
     @Override
     protected void renderGate(ContextSimpleBuffer contextSimpleBuffer, int frame, Matrix2f matrix2f) {
-        final float rotation = 0;//((frame / 5f) % 360) / 156f * 360F;
+        final float rotation = ((frame / 5f) % 360) / 156f * 360F;
+        matrix2f.rotate((float) Math.toRadians(rotation));
         renderRing(contextSimpleBuffer, matrix2f, rotation);
         renderSymbols(contextSimpleBuffer, matrix2f, rotation);
         renderChevrons(contextSimpleBuffer, matrix2f);
@@ -60,7 +61,7 @@ public class UniverseStargate extends GenericStargate {
     @Override
     protected void renderRing(ContextSimpleBuffer contextSimpleBuffer, Matrix2f matrix2f, float rotation) {
         Matrix2f m = new Matrix2f(matrix2f);
-        m.rotate(toRadians(rotation - UNIVERSE_ANGLE / 2));
+        m.rotate(toRadians(-UNIVERSE_ANGLE / 2));
         for (int j = 0; j < UNIVERSE_SIDES; j++) {
             renderUniverseRing(contextSimpleBuffer, m, j);
             m.rotate(toRadians(UNIVERSE_ANGLE));
@@ -71,7 +72,6 @@ public class UniverseStargate extends GenericStargate {
     protected void renderSymbols(ContextSimpleBuffer contextSimpleBuffer, Matrix2f matrix2f, float rotation) {
         // the matrix object is reused for each ring segment & symbol
         Matrix2f m = new Matrix2f(matrix2f);
-        m.rotate((float) Math.toRadians(rotation));
         for (int symbol = 0; symbol < symbolCount; symbol++) {
             renderSymbol(contextSimpleBuffer, m, symbol);
         }
@@ -133,7 +133,7 @@ public class UniverseStargate extends GenericStargate {
     @Override
     protected void renderChevron(ContextSimpleBuffer bb, Matrix2f matrix2f, int chevron) {
         Matrix3f m = new Matrix3f(matrix2f);
-        m.rotate(new Quaternionf().rotationZ(toRadians(CHEVRON_ANGLE * chevron/* + rotation*/)));
+        m.rotate(new Quaternionf().rotationZ(toRadians(CHEVRON_ANGLE * chevron)));
         // * 3.35f I have no idea why this is needed any why chevrons are not positioned correctly otherwise
         translate(m, 0, DEFAULT_RADIUS * 3.35f - (5.5f / 16));
         UniverseChevron.renderChevron(bb, m);

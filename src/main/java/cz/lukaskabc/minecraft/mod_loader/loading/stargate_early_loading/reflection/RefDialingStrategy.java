@@ -17,7 +17,8 @@ public class RefDialingStrategy extends ReflectionAccessor {
             MilkyWay3Step.class,
             PegasusLoading.class,
             PegasusLoop.class,
-            UniverseLoop.class
+            UniverseLoop.class,
+            UniverseLoopAllEngaged.class
     );
     private static final Logger LOG = LogManager.getLogger();
 

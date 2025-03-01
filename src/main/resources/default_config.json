@@ -16,6 +16,9 @@
       "default",
       "promo",
       "sg-1"
+    ],
+    "universe": [
+      "default"
     ]
     // do not add pegasus and universe stargates (not implemented yet)
   },
@@ -24,7 +27,7 @@
   "default_dialing_strategies": {
     "milky_way": "MilkyWay3Step",
     "pegasus": "PegasusLoop",
-    "universe": "UniverseLoop"
+    "universe": "UniverseLoopAllEngaged"
   },
   // List of symbols referenced from stargate variants
   "symbols": {
