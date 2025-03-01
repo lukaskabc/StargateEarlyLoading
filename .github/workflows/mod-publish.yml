@@ -63,7 +63,7 @@ jobs:
           # A glob determining the primary files to upload.
           files-primary: build/libs/stargate_early_loading-*.jar
           # The version type - alpha, beta, or release.
-          version-type: alpha
+          version-type: beta
           # An array of supported mod loaders.
           loaders: neoforge
           # An array of supported Minecraft versions.
