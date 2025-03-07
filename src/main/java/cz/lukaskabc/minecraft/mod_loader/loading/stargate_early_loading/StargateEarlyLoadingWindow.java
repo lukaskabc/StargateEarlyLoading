@@ -81,13 +81,33 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private static void checkFMLConfig() {
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
         if (!WINDOW_PROVIDER.equals(windowProvider)) {
-            JOptionPane.showMessageDialog(null, """
-                    You have installed the Stargate Early Loading mod,
-                    but the early window provider is not set to StargateEarlyLoading in the fml.toml config!
-                    Please update the config and restart the game.
-                    See mod description for instructions.
-                    https://github.com/lukaskabc/StargateEarlyLoading
-                    """);
+            // Create a parent frame that will appear in the taskbar
+            final JFrame frame = new JFrame("Missing NeoForge configuration");
+            frame.setAlwaysOnTop(true);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setLocationRelativeTo(null); // Center on screen
+            frame.setVisible(true);
+
+            final int answer = JOptionPane.showConfirmDialog(frame, """
+                            You have installed the Stargate Early Loading mod,
+                            but the early window provider is not set to WINDOW_PROVIDER in the fml.toml config!
+                            Please update the config and restart the game.
+                            See mod description for instructions.
+                            https://github.com/lukaskabc/StargateEarlyLoading
+                            
+                            Do you wish to update the config?
+                            Answering yes will update the config and exit the game.
+                            """.replace("WINDOW_PROVIDER", WINDOW_PROVIDER),
+                    "Missing NeoForge configuration",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            frame.dispose();
+
+            if (answer == JOptionPane.YES_OPTION) {
+                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
+                System.exit(0);
+            }
         }
     }
 
