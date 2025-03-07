@@ -18,7 +18,8 @@ public class RefDialingStrategy extends ReflectionAccessor {
             PegasusLoading.class,
             PegasusLoop.class,
             UniverseLoop.class,
-            UniverseLoopAllEngaged.class
+            UniverseLoopAllEngaged.class,
+            UniverseLoading.class
     );
     private static final Logger LOG = LogManager.getLogger();
 

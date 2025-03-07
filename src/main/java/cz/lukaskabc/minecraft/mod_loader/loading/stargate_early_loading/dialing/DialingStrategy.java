@@ -18,6 +18,21 @@ public abstract class DialingStrategy {
             "Sided setup",
             "Complete loading of"
     );
+
+      /*
+      // TODO: could this be more parametrized in a similar way as gate variants?
+      // maybe even independently on the stargate type?
+      Available strategies:
+      - MilkyWay2Step: the ring rotates, chevrons take 2 steps to lock
+      - MilkyWay3Step: the ring rotates, chevrons take 3 steps to lock
+      - PegasusLoading: Symbols are lighting up according to the Minecraft loading progress
+      - PegasusLoop: Symbols are lighting up in an endless loop one at a time, chevrons are locking according to Minecraft loading progress
+      - UniverseLoading: Symbols are lighting up according to the Minecraft loading progress, the whole gate is rotating, all chevrons are active
+      - UniverseLoop: Chevrons are locking according to loading progress, the whole gate is rotating, no symbol is engaged
+      - UniverseLoopAllEngaged: All chevrons are active, the whole gate is rotating, no symbol is engaged
+      */
+
+
     public static final String MINECRAFT_PROGRESS = "Minecraft Progress";
     public static final String EARLY_PROGRESS = "EARLY";
     public static final int ENCODE_DELAY = 20;
@@ -48,7 +63,7 @@ public abstract class DialingStrategy {
     public static float getMinecraftProgress(final List<ProgressMeter> progressMeters) {
         return progressMeters.stream().filter(meter -> MINECRAFT_PROGRESS.equals(meter.name())).findAny()
                 .orElseGet(DialingStrategy::getNullMeter)
-                .progress() * 4f;
+                .progress();
     }
 
     public static boolean isEarlyProgress(final List<ProgressMeter> progressMeters) {

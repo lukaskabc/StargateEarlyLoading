@@ -5,6 +5,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exceptio
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.SGJourneyModel;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.Color;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
 import net.neoforged.fml.earlydisplay.ElementShader;
@@ -17,6 +18,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
@@ -68,10 +71,14 @@ public abstract class GenericStargate {
     protected final StargateVariant variant;
     protected final Config.Symbols symbols;
 
-    // bitmap
+    private final List<Integer> encodedAddress = new ArrayList<>(9);
+
+    /// bitmap
     private volatile int engagedChevrons = 0;
-    // bitmap
+    /// bitmap
     private volatile int raisedChevrons = 0;
+    /// bitmap
+    private volatile long engagedSymbols = 0;
 
     protected GenericStargate(short symbolCount, StargateVariant variant, Config.Symbols symbols) {
         this.symbolCount = symbolCount;
@@ -105,6 +112,13 @@ public abstract class GenericStargate {
             throw new InitializationException(e);
         }
         return RefRenderElement.constructor(this::render);
+    }
+
+    public synchronized void encodeSymbol(int symbol) {
+        if (symbol < 0 || symbol >= symbolCount) {
+            throw new IllegalArgumentException("Symbol " + symbol + " is out of bounds - symbol count is " + symbolCount);
+        }
+        engagedSymbols |= (1L << symbol);
     }
 
     public synchronized void engageChevron(int chevron) {
@@ -141,6 +155,10 @@ public abstract class GenericStargate {
 
     public boolean isChevronRaised(int chevron) {
         return (raisedChevrons & (1 << chevron)) > 0;
+    }
+
+    public boolean isSymbolEngaged(int symbol) {
+        return (engagedSymbols & (1L << symbol)) > 0;
     }
 
     protected void renderInnerRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
@@ -360,8 +378,10 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f((symbolOffset + (stargateSymbolRingInnerCenter * 32 / 16 / textureXSize)) * 64, (8 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 32) * 4);
         Vector2f u4 = new Vector2f((symbolOffset + (stargateSymbolRingOuterCenter * 32 / 16 / textureXSize)) * 64, (8 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 32) * 4);
 
-        // TODO: engaged symbols
-        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, variant.getSymbols().getSymbolColor().packedColor());
+        final Color symbolColor = isSymbolEngaged(symbolNumber) ?
+                variant.getSymbols().getEngagedSymbolColor() :
+                variant.getSymbols().getSymbolColor();
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, symbolColor.packedColor());
     }
 
     protected void renderSymbol(ContextSimpleBuffer bb, Matrix2f matrix2f, int symbol) {
@@ -397,5 +417,9 @@ public abstract class GenericStargate {
 
     public StargateVariant getVariant() {
         return variant;
+    }
+
+    public int getSymbolCount() {
+        return symbolCount;
     }
 }

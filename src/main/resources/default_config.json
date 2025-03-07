@@ -23,7 +23,16 @@
     // do not add pegasus and universe stargates (not implemented yet)
   },
   // fallback values for variants without an explicit dialing strategy
-  // available strategies: MilkyWay2Step, MilkyWay3Step, other strategies are not implemented yet!
+  /*
+  Available strategies:
+  - MilkyWay2Step: the ring rotates, chevrons take 2 steps to lock
+  - MilkyWay3Step: the ring rotates, chevrons take 3 steps to lock
+  - PegasusLoading: Symbols are lighting up according to the Minecraft loading progress
+  - PegasusLoop: Symbols are lighting up in an endless loop one at a time, chevrons are locking according to Minecraft loading progress
+  - UniverseLoading: Symbols are lighting up according to the Minecraft loading progress, the whole gate is rotating, all chevrons are active
+  - UniverseLoop: Chevrons are locking according to loading progress, the whole gate is rotating, no symbol is engaged
+  - UniverseLoopAllEngaged: All chevrons are active, the whole gate is rotating, no symbol is engaged
+  */
   "default_dialing_strategies": {
     "milky_way": "MilkyWay3Step",
     "pegasus": "PegasusLoop",

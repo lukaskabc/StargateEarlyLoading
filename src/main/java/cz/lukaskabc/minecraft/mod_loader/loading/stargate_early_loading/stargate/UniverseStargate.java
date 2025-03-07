@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargat
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.SGJourneyModel;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.Color;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateType;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
@@ -104,7 +105,7 @@ public class UniverseStargate extends GenericStargate {
         final int symbolInRow = symbolNumber % 4;
 
         final Matrix2f m = new Matrix2f(matrix2f);
-        m.rotate(toRadians((-UNIVERSE_ANGLE * 3 / 2) + (symbolRow * -CHEVRON_ANGLE) + (symbolInRow * -UNIVERSE_ANGLE)));
+        m.rotate(toRadians((UNIVERSE_ANGLE * 3 / 2) + (symbolRow * CHEVRON_ANGLE) + (symbolInRow * UNIVERSE_ANGLE)));
 
         Vector2f v1 = new Vector2f(-STARGATE_SYMBOL_RING_OUTER_CENTER, STARGATE_SYMBOL_RING_OUTER_HEIGHT);
         Vector2f v2 = new Vector2f(-STARGATE_SYMBOL_RING_INNER_CENTER, STARGATE_SYMBOL_RING_INNER_HEIGHT);
@@ -121,8 +122,10 @@ public class UniverseStargate extends GenericStargate {
         Vector2f u3 = new Vector2f((symbolOffset + (STARGATE_SYMBOL_RING_INNER_CENTER * 32 / 16 / textureXSize)) * 64, 64);
         Vector2f u4 = new Vector2f((symbolOffset + (STARGATE_SYMBOL_RING_OUTER_CENTER * 32 / 16 / textureXSize)) * 64, 0);
 
-        // TODO: engaged symbols
-        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, variant.getSymbols().getSymbolColor().packedColor());
+        final Color symbolColor = isSymbolEngaged(symbolNumber) ?
+                variant.getSymbols().getEngagedSymbolColor() :
+                variant.getSymbols().getSymbolColor();
+        renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, symbolColor.packedColor());
     }
 
     @Override
