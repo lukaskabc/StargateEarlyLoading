@@ -35,7 +35,7 @@
   */
   "default_dialing_strategies": {
     "milky_way": "MilkyWay3Step",
-    "pegasus": "PegasusLoop",
+    "pegasus": "PegasusLoading",
     "universe": "UniverseLoopAllEngaged"
   },
   // List of symbols referenced from stargate variants

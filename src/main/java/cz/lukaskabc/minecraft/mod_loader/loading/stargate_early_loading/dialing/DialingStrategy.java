@@ -36,6 +36,7 @@ public abstract class DialingStrategy {
     public static final String MINECRAFT_PROGRESS = "Minecraft Progress";
     public static final String EARLY_PROGRESS = "EARLY";
     public static final int ENCODE_DELAY = 20;
+    public static final int ENCODE_DELAY_HALF = ENCODE_DELAY / 2;
     public static final float EARLY_CHEVRONS = EARLY_LABELS.size();
     public static final float MINECRAFT_CHEVRONS = NUMBER_OF_CHEVRONS - EARLY_CHEVRONS;
     protected final GenericStargate stargate;
@@ -78,7 +79,7 @@ public abstract class DialingStrategy {
         return EARLY_LABELS.stream().anyMatch(earlyLabel -> earlyLabel.startsWith(label));
     }
 
-    public float earlyProgress(final List<ProgressMeter> progressMeters) {
+    public float getEarlyProgress(final List<ProgressMeter> progressMeters) {
         if (progressMeters.size() == 1) {
             final String label = progressMeters.getFirst().label().getText();
             if (anyEarlyLabelStartsWith(label)) {
@@ -90,6 +91,9 @@ public abstract class DialingStrategy {
         return earlyLabels.size() / (float) EARLY_LABELS.size();
     }
 
+    /**
+     * Periodically called method by the progress bar to update the loading state
+     */
     public void updateProgress(List<ProgressMeter> progressMeters, int frameNumber) {
         while (!toExecute.isEmpty() && toExecute.firstKey() <= frameNumber) {
             toExecute.remove(toExecute.firstKey()).run();
@@ -98,7 +102,7 @@ public abstract class DialingStrategy {
     }
 
     protected void progressChevron(List<ProgressMeter> progressMeters, int frameNumber) {
-        final float earlyProgress = earlyProgress(progressMeters);
+        final float earlyProgress = getEarlyProgress(progressMeters);
         final float minecraftProgress = getMinecraftProgress(progressMeters);
 
         for (int chevron = lastChevron; chevron <= NUMBER_OF_CHEVRONS; chevron++) {

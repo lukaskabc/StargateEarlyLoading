@@ -228,7 +228,7 @@ public abstract class GenericStargate {
         Matrix2f m = new Matrix2f(matrix2f);
         m.rotate(toRadians(rotation));
         for (int symbol = 0; symbol < symbolCount; symbol++) {
-            renderSymbolRingSegment(contextSimpleBuffer, m, symbol, rotation);
+            renderSymbolRingSegment(contextSimpleBuffer, m);
             renderSymbol(contextSimpleBuffer, m, symbol);
             // yes the last rotation is wasted
             m.rotate(toRadians(symbolAngle));
@@ -277,7 +277,7 @@ public abstract class GenericStargate {
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
-    protected void renderSymbolRingSegment(ContextSimpleBuffer bb, Matrix2f matrix2f, int symbol, float rotation) {
+    protected void renderSymbolRingSegment(ContextSimpleBuffer bb, Matrix2f matrix2f) {
         Vector2f v1 = new Vector2f(-stargateSymbolRingOuterCenter, STARGATE_SYMBOL_RING_OUTER_HEIGHT);
         Vector2f v2 = new Vector2f(-stargateSymbolRingInnerCenter, STARGATE_SYMBOL_RING_INNER_HEIGHT);
         Vector2f v3 = new Vector2f(stargateSymbolRingInnerCenter, STARGATE_SYMBOL_RING_INNER_HEIGHT);
