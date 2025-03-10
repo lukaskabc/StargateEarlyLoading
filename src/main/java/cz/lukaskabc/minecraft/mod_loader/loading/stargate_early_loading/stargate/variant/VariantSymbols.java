@@ -8,8 +8,20 @@ import java.util.Optional;
 @NullMarked
 public class VariantSymbols {
     private Color symbolColor = new Color();
+    /**
+     * The Symbol is encoded if it was dialed but the stargate is not connected yet
+     * <p>
+     * Because the loading does not display the gate when its inactive, there is no reason for symbolsGlow
+     * and because there is no state for connected gate, engaged symbol is not needed either
+     */
     @Nullable
     private Color encodedSymbolColor;
+
+    /**
+     * The Symbol is engaged if the Stargate is connected
+     * <p>
+     * Keeping this here to maintain the Color fallback order and keep the behavior of SGJ
+     */
     @Nullable
     private Color engagedSymbolColor;
 
@@ -17,10 +29,6 @@ public class VariantSymbols {
     private String permanentPointOfOrigin;
     @Nullable
     private String permanentSymbols;
-
-    private boolean symbolsGlow = false;
-    private boolean encodedSymbolsGlow = false;
-    private boolean engagedSymbolsGlow = false;
 
     public Color getSymbolColor() {
         return symbolColor;
@@ -41,7 +49,8 @@ public class VariantSymbols {
         this.encodedSymbolColor = encodedSymbolColor;
     }
 
-    public Color getEngagedSymbolColor() {
+    /// keeping private only for fallback purposes
+    private Color getEngagedSymbolColor() {
         if (engagedSymbolColor == null) {
             return getSymbolColor();
         }
@@ -66,29 +75,5 @@ public class VariantSymbols {
 
     public void setPermanentSymbols(String permanentSymbols) {
         this.permanentSymbols = permanentSymbols;
-    }
-
-    public boolean isSymbolsGlow() {
-        return symbolsGlow;
-    }
-
-    public void setSymbolsGlow(boolean symbolsGlow) {
-        this.symbolsGlow = symbolsGlow;
-    }
-
-    public boolean isEncodedSymbolsGlow() {
-        return encodedSymbolsGlow;
-    }
-
-    public void setEncodedSymbolsGlow(boolean encodedSymbolsGlow) {
-        this.encodedSymbolsGlow = encodedSymbolsGlow;
-    }
-
-    public boolean isEngagedSymbolsGlow() {
-        return engagedSymbolsGlow;
-    }
-
-    public void setEngagedSymbolsGlow(boolean engagedSymbolsGlow) {
-        this.engagedSymbolsGlow = engagedSymbolsGlow;
     }
 }

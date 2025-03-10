@@ -122,8 +122,8 @@ public class UniverseStargate extends GenericStargate {
         Vector2f u3 = new Vector2f((symbolOffset + (STARGATE_SYMBOL_RING_INNER_CENTER * 32 / 16 / textureXSize)) * 64, 64);
         Vector2f u4 = new Vector2f((symbolOffset + (STARGATE_SYMBOL_RING_OUTER_CENTER * 32 / 16 / textureXSize)) * 64, 0);
 
-        final Color symbolColor = isSymbolEngaged(symbolNumber) ?
-                variant.getSymbols().getEngagedSymbolColor() :
+        final Color symbolColor = isSymbolEncoded(symbolNumber) ?
+                variant.getSymbols().getEncodedSymbolColor() :
                 variant.getSymbols().getSymbolColor();
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, symbolColor.packedColor());
     }

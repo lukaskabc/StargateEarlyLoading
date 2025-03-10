@@ -20,9 +20,6 @@
       "blue": 1.0,
       "alpha": 1.0
     },
-    "symbols_glow": true,
-    "encoded_symbols_glow": true,
-    "engaged_symbols_glow": true,
     "permanent_symbols": "pegasus:lantea",
     "permanent_point_of_origin": "assets/symbols/pegasus/subido_origin.png"
   }

@@ -75,7 +75,7 @@ public abstract class GenericStargate {
     /// bitmap
     private volatile int raisedChevrons = 0;
     /// bitmap
-    private volatile long engagedSymbols = 0;
+    private volatile long encodedSymbols = 0;
 
     protected GenericStargate(short symbolCount, StargateVariant variant, Config.Symbols symbols) {
         this.symbolCount = symbolCount;
@@ -115,7 +115,7 @@ public abstract class GenericStargate {
         if (symbol < 0 || symbol >= symbolCount) {
             throw new IllegalArgumentException("Symbol " + symbol + " is out of bounds - symbol count is " + symbolCount);
         }
-        engagedSymbols |= (1L << symbol);
+        encodedSymbols |= (1L << symbol);
     }
 
     public synchronized void engageChevron(int chevron) {
@@ -154,8 +154,8 @@ public abstract class GenericStargate {
         return (raisedChevrons & (1 << chevron)) > 0;
     }
 
-    public boolean isSymbolEngaged(int symbol) {
-        return (engagedSymbols & (1L << symbol)) > 0;
+    public boolean isSymbolEncoded(int symbol) {
+        return (encodedSymbols & (1L << symbol)) > 0;
     }
 
     protected void renderInnerRing(final ContextSimpleBuffer bb, final Matrix2f matrix2f, final int j) {
@@ -375,8 +375,8 @@ public abstract class GenericStargate {
         Vector2f u3 = new Vector2f((symbolOffset + (stargateSymbolRingInnerCenter * 32 / 16 / textureXSize)) * 64, (8 + STARGATE_SYMBOL_RING_HEIGHT / 2 * 32) * 4);
         Vector2f u4 = new Vector2f((symbolOffset + (stargateSymbolRingOuterCenter * 32 / 16 / textureXSize)) * 64, (8 - STARGATE_SYMBOL_RING_HEIGHT / 2 * 32) * 4);
 
-        final Color symbolColor = isSymbolEngaged(symbolNumber) ?
-                variant.getSymbols().getEngagedSymbolColor() :
+        final Color symbolColor = isSymbolEncoded(symbolNumber) ?
+                variant.getSymbols().getEncodedSymbolColor() :
                 variant.getSymbols().getSymbolColor();
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4, symbolColor.packedColor());
     }
@@ -387,7 +387,7 @@ public abstract class GenericStargate {
 
         if (symbol == 0) {
             usePoOTexture(bb);
-            renderSingleSymbol(bb, matrix2f, 0, 0.5F, 1);
+            renderSingleSymbol(bb, matrix2f, symbol, 0.5F, 1);
         } else {
             useSymbolsTexture(bb);
             renderSingleSymbol(bb, matrix2f, symbol, symbols.getTextureOffset(symbol), symbols.size());

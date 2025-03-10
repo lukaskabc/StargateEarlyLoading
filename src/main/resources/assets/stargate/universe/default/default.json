@@ -20,11 +20,6 @@
       "blue": 1.0,
       "alpha": 1.0
     },
-    "symbols_glow": false,
-    "encoded_symbols_glow": true,
-    "engaged_symbols_glow": true,
-    "engage_encoded_symbols": true,
-    "engage_symbols_on_incoming": false,
     "permanent_symbols": "universal",
     "permanent_point_of_origin": "assets/symbols/universal/universal_0_origin.png"
   }
