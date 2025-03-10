@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.DialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.Background;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.CenteredLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDialingStrategy;
@@ -52,6 +53,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private final Config configuration;
     private final GenericStargate stargate;
     private final DialingStrategy dialingStrategy;
+    @Nullable
+    private CenteredLogo centeredLogo = null;
 
     /**
      * Loads configuration, picks random stargate and loads its variant configuration.
@@ -122,6 +125,10 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
         elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
+        if (configuration.getLogoTexture() != null) {
+            centeredLogo = new CenteredLogo(configuration.getLogoTexture(), configuration.getLogoTextureSize());
+            elements.add(centeredLogo.get());
+        }
         elements.add(stargate.createRenderElement());
         elements.add(new StartupProgressBar(font, dialingStrategy).get());
 // TODO fix element positions and scaling - test with fml scale
@@ -259,8 +266,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     @Override
     public void close() {
         super.close();
-        if (configuration.doCrashAfterLoad()) {
-            throw new RuntimeException("Loading completed, crashing the game after loading can be disabled in stargate-early-loading.json");
+        if (configuration.doExitAfterLoad()) {
+            System.exit(13);
         }
     }
 
@@ -271,7 +278,12 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      */
     @Override
     public void addMojangTexture(int textureId) {
-        accessor.getElements().addLast(new MojangLogo(textureId, accessor.getFrameCount()).get());
+        int delayMojang = 0;
+        if (centeredLogo != null) {
+            centeredLogo.setFadeOutStart(accessor.getFrameCount());
+            delayMojang = 5;
+        }
+        accessor.getElements().addLast(new MojangLogo(textureId, accessor.getFrameCount() + delayMojang).get());
     }
 
     /**

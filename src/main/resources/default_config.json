@@ -19,9 +19,18 @@
     ],
     "universe": [
       "default"
+    ],
+    "pegasus": [
+      "default"
     ]
-    // do not add pegasus and universe stargates (not implemented yet)
   },
+  // Adds a logo image to the center of the loading screen
+  // The logo will be in the same place where the Mojang logo will appear
+  // The image will fade out before the Mojang logo appears
+  "logo_texture": null,
+  // set the size of the logo image in pixels
+  "logo_width": 0,
+  "logo_height": 0,
   // fallback values for variants without an explicit dialing strategy
   /*
   Available strategies:
@@ -82,4 +91,7 @@
   ]
   // alternatively you can use
   // "chevron_order": [1, 2, 3, 6, 7, 8, 4, 5]
+
+  // The game will automatically exit with Code 13 after the loading is completed (enable only for debugging)
+  // "exit_after_load": true
 }

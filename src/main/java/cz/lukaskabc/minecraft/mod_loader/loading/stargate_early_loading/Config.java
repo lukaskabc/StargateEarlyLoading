@@ -4,15 +4,20 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.PegasusLoop;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.UniverseLoop;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateType;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
 public class Config {
-    private boolean crashAfterLoad = false;
+    private boolean exitAfterLoad = false;
     private AllowedVariants variants = new AllowedVariants();
     private Map<String, Symbols> symbols = Map.of();
     private String[] backgrounds = new String[0];
+    @Nullable
+    private String logoTexture = null;
+    private int logoWidth = 0;
+    private int logoHeight = 0;
     private List<Integer> chevronOrder = List.of(1, 2, 3, 4, 5, 6, 7, 8);
 
     private Map<StargateType, String> defaultDialingStrategies = Map.of(
@@ -20,6 +25,10 @@ public class Config {
             StargateType.PEGASUS, PegasusLoop.class.getSimpleName(),
             StargateType.UNIVERSE, UniverseLoop.class.getSimpleName()
     );
+
+    public int[] getLogoTextureSize() {
+        return new int[]{logoWidth, logoHeight};
+    }
 
     public static class AllowedVariants {
         private String[] milkyWay = new String[0];
@@ -102,12 +111,37 @@ public class Config {
         this.defaultDialingStrategies = defaultDialingStrategies;
     }
 
-    public boolean doCrashAfterLoad() {
-        return crashAfterLoad;
+    public boolean doExitAfterLoad() {
+        return exitAfterLoad;
     }
 
-    public void setCrashAfterLoad(boolean crashAfterLoad) {
-        this.crashAfterLoad = crashAfterLoad;
+    public void setExitAfterLoad(boolean exitAfterLoad) {
+        this.exitAfterLoad = exitAfterLoad;
     }
+
+    public @Nullable String getLogoTexture() {
+        return logoTexture;
+    }
+
+    public void setLogoTexture(@Nullable String logoTexture) {
+        this.logoTexture = logoTexture;
+    }
+
+    public int getLogoWidth() {
+        return logoWidth;
+    }
+
+    public void setLogoWidth(int logoWidth) {
+        this.logoWidth = logoWidth;
+    }
+
+    public int getLogoHeight() {
+        return logoHeight;
+    }
+
+    public void setLogoHeight(int logoHeight) {
+        this.logoHeight = logoHeight;
+    }
+
     // endregion
 }

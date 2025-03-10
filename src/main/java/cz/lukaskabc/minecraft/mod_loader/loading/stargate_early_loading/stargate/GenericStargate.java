@@ -8,6 +8,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflecti
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.Color;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.TextureIdentifierConstants;
 import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
@@ -28,10 +29,6 @@ import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.u
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 public abstract class GenericStargate {
-    private static final int STARGATE_TEXTURE_ID = 2;
-    private static final int STARGATE_ENGAGED_TEXTURE_ID = 3;
-    private static final int STARGATE_SYMBOLS_TEXTURE_ID = 4;
-    private static final int STARGATE_POO_SYMBOL_TEXTURE_ID = 5;
     private static final int DEFAULT_TEXTURE_SIZE = 2608;
     protected static final float DEFAULT_RADIUS = 3.5F;
     protected static final int DEFAULT_SIDES = 36;
@@ -100,13 +97,13 @@ public abstract class GenericStargate {
         final int textureOffset = GL_TEXTURE0 + INDEX_TEXTURE_OFFSET;
         try {
             // stargate texture
-            STBHelper.resolveAndBindTexture(variant.getTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_TEXTURE_ID + textureOffset);
+            STBHelper.resolveAndBindTexture(variant.getTexture(), DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE + textureOffset);
             // stargate engaged texture
-            STBHelper.resolveAndBindTexture(variant.getEngagedTexture(), DEFAULT_TEXTURE_SIZE, STARGATE_ENGAGED_TEXTURE_ID + textureOffset);
+            STBHelper.resolveAndBindTexture(variant.getEngagedTexture(), DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE_ENGAGED + textureOffset);
             // symbols texture
-            STBHelper.resolveAndBindTexture(symbols.file(), DEFAULT_TEXTURE_SIZE, STARGATE_SYMBOLS_TEXTURE_ID + textureOffset);
+            STBHelper.resolveAndBindTexture(symbols.file(), DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE_SYMBOLS + textureOffset);
             // Point of Origin texture
-            STBHelper.resolveAndBindTexture(pointOfOrigin, DEFAULT_TEXTURE_SIZE, STARGATE_POO_SYMBOL_TEXTURE_ID + textureOffset);
+            STBHelper.resolveAndBindTexture(pointOfOrigin, DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE_POO_SYMBOL + textureOffset);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new InitializationException(e);
@@ -204,7 +201,7 @@ public abstract class GenericStargate {
     }
 
     protected static void initRender(ContextSimpleBuffer contextSimpleBuffer) {
-        contextSimpleBuffer.context().elementShader().updateTextureUniform(STARGATE_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE + INDEX_TEXTURE_OFFSET);
         contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
@@ -316,26 +313,26 @@ public abstract class GenericStargate {
 
     protected void useStargateTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(STARGATE_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE + INDEX_TEXTURE_OFFSET);
         // not updating type uniform as it is already texture
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 
     protected void useEngagedStargateTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(STARGATE_ENGAGED_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE_ENGAGED + INDEX_TEXTURE_OFFSET);
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 
     protected void useSymbolsTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(STARGATE_SYMBOLS_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE_SYMBOLS + INDEX_TEXTURE_OFFSET);
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 
     protected void usePoOTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(STARGATE_POO_SYMBOL_TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE_POO_SYMBOL + INDEX_TEXTURE_OFFSET);
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 

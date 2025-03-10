@@ -4,6 +4,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exceptio
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.TextureIdentifierConstants;
 import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.QuadHelper;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -22,7 +23,6 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
  * Background element rendering static texture.
  */
 public class Background implements Supplier<RenderElement> {
-    private static final int TEXTURE_ID = 1;
     private static final int DEFAULT_TEXTURE_SIZE = 34881;
 
     /**
@@ -57,7 +57,7 @@ public class Background implements Supplier<RenderElement> {
     @Override
     public RenderElement get() {
         try {
-            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + TextureIdentifierConstants.BACKGROUND + INDEX_TEXTURE_OFFSET);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new InitializationException(e);
@@ -72,7 +72,7 @@ public class Background implements Supplier<RenderElement> {
      * @param frame               the current frame number.
      */
     private void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
-        contextSimpleBuffer.context().elementShader().updateTextureUniform(TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(TextureIdentifierConstants.BACKGROUND + INDEX_TEXTURE_OFFSET);
         contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
         QuadHelper.loadQuad(contextSimpleBuffer.simpleBufferBuilder(), 0f, contextSimpleBuffer.context().scaledWidth(), 0f, contextSimpleBuffer.context().scaledHeight(), 0f, 1f, 0f, 1f, COLOR);
