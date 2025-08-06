@@ -2,27 +2,19 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.78'
+    id 'net.neoforged.moddev' version '2.0.80'
 }
 
 tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
+group = 'cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading'
 version = mod_version
-group = mod_group_id
-
-base {
-    archivesName = mod_id
-}
 
 repositories {
     mavenLocal()
     mavenCentral()
-}
-
-dependencies {
-    api("org.jspecify:jspecify:1.0.0")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -33,6 +25,7 @@ neoForge {
 
     runs {
         configureEach {
+            jvmArguments.add("-ea")
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
         }
@@ -44,10 +37,6 @@ neoForge {
         server {
             server()
         }
-
-        data {
-            data()
-        }
     }
 
     mods {
@@ -55,11 +44,14 @@ neoForge {
             sourceSet(sourceSets.main)
         }
     }
+}
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
+dependencies {
+    api("org.jspecify:jspecify:1.0.0")
+}
+
+test {
+    useJUnitPlatform()
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -75,6 +67,12 @@ publishing {
         maven {
             url "file://${project.projectDir}/repo"
         }
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    from('LICENSE') {
+        into('/')
     }
 }
 
