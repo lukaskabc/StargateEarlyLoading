@@ -1,6 +1,7 @@
 # Stargate Early Loading
 
 <a href="https://www.curseforge.com/minecraft/mc-mods/stargate-early-loading" target="_blank"><img src="https://img.shields.io/curseforge/dt/1205356?style=for-the-badge&logo=curseforge&color=626e7b" alt="Curseforge"></a>
+<a href="https://modrinth.com/mod/stargate-early-loading" target="_blank"><img src="https://img.shields.io/modrinth/dt/stargate-early-loading?style=for-the-badge&logo=modrinth&color=626e7b" alt="Modrinth"></a>
 
 _Not really a NeoForge mod_ that replaces the game loading.  
 Yes, including the NeoForge's **early loading** with a custom **animated** one, see video below.
