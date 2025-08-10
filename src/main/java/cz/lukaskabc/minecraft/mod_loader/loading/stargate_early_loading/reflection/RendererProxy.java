@@ -1,9 +1,9 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.RenderingException;
+
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +35,7 @@ public class RendererProxy implements InvocationHandler {
                 LOG.error("Early loading rendering exception", t);
                 System.exit(1);
                 LOG.error("An exception occurred during early loading rendering, the game will exit immediately. No crash report will be generated!");
-                throw new RenderingException(t);
+                throw new RuntimeException(t);
             }
             return null; // void returning method
         }

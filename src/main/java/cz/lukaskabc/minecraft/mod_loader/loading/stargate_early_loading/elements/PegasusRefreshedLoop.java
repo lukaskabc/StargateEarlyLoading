@@ -1,8 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
-import net.neoforged.fml.earlydisplay.QuadHelper;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.QuadHelper;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
 
 public class PegasusRefreshedLoop {
     private static final int SYMBOL_SIZE = 16;

@@ -1,24 +1,25 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
-import net.neoforged.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Proxy;
 import java.util.function.Supplier;
 
-public class RefRenderElement extends ReflectionAccessor {
-    public static final Class<?> RENDERER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Renderer");
-    public static final Class<?> INITIALIZER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Initializer");
-    public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor.*;
+
+public class RefRenderElement {
+    public static final Class<?> RENDERER_CLASS = findClass("net.minecraftforge.fml.earlydisplay.RenderElement$Renderer");
+    public static final Class<?> INITIALIZER_CLASS = findClass("net.minecraftforge.fml.earlydisplay.RenderElement$Initializer");
     private static final MethodHandles.Lookup lookup = privateLookup(RenderElement.class);
-    public static final int INDEX_TEXTURE_OFFSET = (int) findStaticField(lookup, "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
     private static final MethodHandle constructor = findConstructor(lookup, INITIALIZER_CLASS);
+    private static final VarHandle globalAlpha = findStaticField(lookup, "globalAlpha", int.class);
 
-    public RefRenderElement(RenderElement target) {
-        super(target, RenderElement.class);
+    private RefRenderElement() {
+        throw new AssertionError();
     }
-
 
     private static RenderElement constructor(final Supplier<?> rendererInitializer) {
         try {
@@ -28,8 +29,16 @@ public class RefRenderElement extends ReflectionAccessor {
         }
     }
 
+    public static int getGlobalAlpha() {
+        return (int) globalAlpha.get();
+    }
+
+    public static void setGlobalAlpha(int alpha) {
+        globalAlpha.set(alpha);
+    }
+
     /**
-     * @return creates a new {@link net.neoforged.fml.earlydisplay.RenderElement RenderElement$Initializer}
+     * @return creates a new {@link RenderElement RenderElement$Initializer}
      * @implNote You must initialize the texture
      * <p>
      * Example renderer implementation:
@@ -45,6 +54,9 @@ public class RefRenderElement extends ReflectionAccessor {
         return constructor(proxyInitializer(renderer));
     }
 
+    /**
+     * @return {@link Supplier}&lt;{@link RenderElement.Initializer}&gt;
+     */
     public static Supplier<?> proxyInitializer(TextureRenderer textureRenderer) {
         return (Supplier<?>) Proxy.newProxyInstance(INITIALIZER_CLASS.getClassLoader(),
                 new Class[]{INITIALIZER_CLASS},
@@ -59,6 +71,10 @@ public class RefRenderElement extends ReflectionAccessor {
                 });
     }
 
+    /**
+     * @return proxied {@link RenderElement.Renderer}
+     * @see RendererProxy
+     */
     private static Object proxyRenderer(TextureRenderer textureRenderer) {
         return Proxy.newProxyInstance(RENDERER_CLASS.getClassLoader(),
                 new Class[]{RENDERER_CLASS},

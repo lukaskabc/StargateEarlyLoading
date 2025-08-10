@@ -1,27 +1,24 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing.DialingStrategy;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefSimpleFont;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.TextureRenderer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
-import net.neoforged.fml.earlydisplay.SimpleFont;
-import net.neoforged.fml.loading.progress.ProgressMeter;
-import net.neoforged.fml.loading.progress.StartupNotificationManager;
+import net.minecraftforge.fml.earlydisplay.ColourScheme;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.SimpleFont;
+import net.minecraftforge.fml.loading.progress.ProgressMeter;
+import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 
 import java.util.List;
-import java.util.function.Supplier;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.getGlobalAlpha;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo.LOGO_NEGATIVE_HEIGHT_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo.LOGO_WIDTH;
-import static java.lang.Math.clamp;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.getGlobalAlpha;
+import static org.joml.Math.clamp;
 
-public class StartupProgressBar extends ProgressBar implements Supplier<RenderElement> {
+public class StartupProgressBar extends ProgressBar implements ElementSupplier {
     private final int lineSpacing;
     private final int descent;
     private final DialingStrategy dialingStrategy;
@@ -40,11 +37,7 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
     }
 
     @Override
-    public RenderElement get() {
-        return RefRenderElement.constructor(this::render);
-    }
-
-    private void render(ContextSimpleBuffer bb, int frameNumber) {
+    public void render(ContextSimpleBuffer bb, int frameNumber) {
         List<ProgressMeter> currentProgress = StartupNotificationManager.getCurrentProgress();
         dialingStrategy.updateProgress(currentProgress, frameNumber);
         final int size = currentProgress.size();
@@ -59,7 +52,7 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
         final RenderElement.DisplayContext ctx = bb.context();
         final int barSpacing = (lineSpacing - descent + BAR_HEIGHT) * ctx.scale();
         final int mojangLogoHeight = ctx.scale() * ((LOGO_WIDTH / 2) - LOGO_NEGATIVE_HEIGHT_OFFSET);
-        final int y = ctx.scaledHeight() / 2 + cnt * barSpacing + MEMORY_BAR_HEIGHT + mojangLogoHeight;
+        final int y = ctx.scaledHeight() / 2 + cnt * barSpacing + mojangLogoHeight;
         final int alpha = 0xFF;
         final int colour = ColourScheme.BLACK.foreground().packedint(alpha);
         TextureRenderer textureRenderer;

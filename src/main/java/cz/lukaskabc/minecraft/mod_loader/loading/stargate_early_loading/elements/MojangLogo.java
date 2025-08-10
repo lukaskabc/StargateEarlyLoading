@@ -2,15 +2,13 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.element
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
-import net.neoforged.fml.earlydisplay.*;
-
-import java.util.function.Supplier;
+import net.minecraftforge.fml.earlydisplay.*;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 
-public class MojangLogo implements Supplier<RenderElement> {
+public class MojangLogo implements ElementSupplier {
     public static final int LOGO_WIDTH = 256;
     public static final int LOGO_NEGATIVE_HEIGHT_OFFSET = 64 + 16;
     private final int textureId;
@@ -26,7 +24,8 @@ public class MojangLogo implements Supplier<RenderElement> {
         return RefRenderElement.constructor(this::render);
     }
 
-    private void render(ContextSimpleBuffer bb, int frame) {
+    @Override
+    public void render(ContextSimpleBuffer bb, int frame) {
         final RenderElement.DisplayContext ctx = bb.context();
         final int logoWidth = LOGO_WIDTH * ctx.scale();
         final int logoHeight = logoWidth / 2;

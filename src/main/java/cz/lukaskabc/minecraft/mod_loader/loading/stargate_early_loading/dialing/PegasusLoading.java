@@ -3,7 +3,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.PegasusStargate;
-import net.neoforged.fml.loading.progress.ProgressMeter;
+import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
 import java.util.List;
 

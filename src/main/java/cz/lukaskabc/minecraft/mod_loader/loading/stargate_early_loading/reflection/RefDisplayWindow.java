@@ -1,8 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection;
 
-import net.neoforged.fml.earlydisplay.*;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import net.minecraftforge.fml.earlydisplay.*;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -12,14 +10,19 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.ReflectionAccessor.*;
 
 /**
  * {@link ReflectionAccessor} for {@link DisplayWindow}.
  */
-public class RefDisplayWindow extends ReflectionAccessor {
+public class RefDisplayWindow {
     private static final MethodHandles.Lookup lookup = privateLookup(DisplayWindow.class);
     private static final MethodHandle initRender = findVirtual(lookup, "initRender", void.class, String.class, String.class);
     private static final MethodHandle fbResize = findVirtual(lookup, "fbResize", void.class, long.class, int.class, int.class);
+    private static final MethodHandle winResize = findVirtual(lookup, "winResize", void.class, long.class, int.class, int.class);
+    private static final MethodHandle winMove = findVirtual(lookup, "winMove", void.class, long.class, int.class, int.class);
     private static final MethodHandle renderThreadFunc = findVirtual(lookup, "renderThreadFunc", void.class);
     private static final VarHandle loadingOverlay = findField(lookup, "loadingOverlay", Method.class);
     private static final VarHandle renderScheduler = findField(lookup, "renderScheduler", ScheduledExecutorService.class);
@@ -37,9 +40,13 @@ public class RefDisplayWindow extends ReflectionAccessor {
     private static final VarHandle font = findField(lookup, "font", SimpleFont.class);
     private static final VarHandle renderLock = findField(lookup, "renderLock", Semaphore.class);
     private static final VarHandle windowTick = findField(lookup, "windowTick", ScheduledFuture.class);
+    private static final VarHandle animationTimerTrigger = findField(lookup, "animationTimerTrigger", AtomicBoolean.class);
+    private static final VarHandle winWidth = findField(lookup, "winWidth", int.class);
+    private static final VarHandle winHeight = findField(lookup, "winHeight", int.class);
+    private final DisplayWindow target;
 
     public RefDisplayWindow(DisplayWindow displayWindow) {
-        super(displayWindow, DisplayWindow.class);
+        this.target = displayWindow;
     }
 
     /**
@@ -54,12 +61,16 @@ public class RefDisplayWindow extends ReflectionAccessor {
     /**
      * @see DisplayWindow#initRender(String, String)
      */
-    public void initRender(@Nullable String mcVersion, @NonNull String forgeVersion) {
+    public void initRender(String mcVersion, String forgeVersion) {
         try {
             initRender.invoke(target, mcVersion, forgeVersion);
         } catch (Throwable e) {
             throw new ReflectionException(e);
         }
+    }
+
+    public ScheduledExecutorService getRenderScheduler() {
+        return (ScheduledExecutorService) renderScheduler.get(target);
     }
 
     /**
@@ -71,8 +82,8 @@ public class RefDisplayWindow extends ReflectionAccessor {
         renderScheduler.set(target, service);
     }
 
-    public ScheduledExecutorService getRenderScheduler() {
-        return (ScheduledExecutorService) renderScheduler.get(target);
+    public ScheduledFuture<?> getInitializationFuture() {
+        return (ScheduledFuture<?>) initializationFuture.get(target);
     }
 
     /**
@@ -94,10 +105,6 @@ public class RefDisplayWindow extends ReflectionAccessor {
 
     public long getGlWindow() {
         return (long) window.get(target);
-    }
-
-    public void setColourScheme(ColourScheme scheme) {
-        colourScheme.set(target, scheme);
     }
 
     public boolean isMaximized() {
@@ -167,5 +174,41 @@ public class RefDisplayWindow extends ReflectionAccessor {
         } catch (Throwable e) {
             throw new ReflectionException(e);
         }
+    }
+
+    public int getWinWidth() {
+        return (int) winWidth.get(target);
+    }
+
+    public int getWinHeight() {
+        return (int) winHeight.get(target);
+    }
+
+    public void winMove(long window, int x, int y) {
+        try {
+            winMove.invoke(target, window, x, y);
+        } catch (Throwable e) {
+            throw new ReflectionException(e);
+        }
+    }
+
+    public void winResize(long window, int width, int height) {
+        try {
+            winResize.invoke(target, window, width, height);
+        } catch (Throwable e) {
+            throw new ReflectionException(e);
+        }
+    }
+
+    public ColourScheme getColourScheme() {
+        return (ColourScheme) colourScheme.get(target);
+    }
+
+    public void setColourScheme(ColourScheme scheme) {
+        colourScheme.set(target, scheme);
+    }
+
+    public AtomicBoolean getAnimationTimerTrigger() {
+        return (AtomicBoolean) animationTimerTrigger.get(target);
     }
 }

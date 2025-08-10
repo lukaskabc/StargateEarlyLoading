@@ -3,30 +3,29 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargat
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.SGJourneyModel;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.StaticSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.Color;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.TextureIdentifierConstants;
-import net.neoforged.fml.earlydisplay.ElementShader;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.ElementShader;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
 import org.jline.utils.Log;
 import org.joml.Matrix2f;
 import org.joml.Matrix3f;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL32C;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.renderTextureCentered;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.toRadians;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper.translate;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 public abstract class GenericStargate {
     private static final int DEFAULT_TEXTURE_SIZE = 2608;
@@ -67,6 +66,10 @@ public abstract class GenericStargate {
     protected final float stargateSymbolRingInnerCenter;
     protected final StargateVariant variant;
     protected final Config.Symbols symbols;
+    protected int stargateTextureId;
+    protected int stargateEngagedTextureId;
+    protected int stargateSymbolsTextureId;
+    protected int stargatePooSymbolTextureId;
 
     private final List<Integer> encodedAddress = new ArrayList<>(9);
 
@@ -94,16 +97,18 @@ public abstract class GenericStargate {
     public RenderElement createRenderElement() {
         // texture initialization
         final String pointOfOrigin = variant.getSymbols().getPermanentPointOfOrigin().orElseThrow(() -> new InitializationException("No permanent Point Of Origin defined!"));
-        final int textureOffset = GL_TEXTURE0 + INDEX_TEXTURE_OFFSET;
+        int[] width = new int[1];
+        int[] height = new int[1];
+
         try {
             // stargate texture
-            STBHelper.resolveAndBindTexture(variant.getTexture(), DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE + textureOffset);
+            stargateTextureId = StaticSTBHelper.resolveAndBindTexture(variant.getTexture(), width, height);
             // stargate engaged texture
-            STBHelper.resolveAndBindTexture(variant.getEngagedTexture(), DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE_ENGAGED + textureOffset);
+            stargateEngagedTextureId = StaticSTBHelper.resolveAndBindTexture(variant.getEngagedTexture(), width, height);
             // symbols texture
-            STBHelper.resolveAndBindTexture(symbols.file(), DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE_SYMBOLS + textureOffset);
+            stargateSymbolsTextureId = StaticSTBHelper.resolveAndBindTexture(symbols.file(), width, height);
             // Point of Origin texture
-            STBHelper.resolveAndBindTexture(pointOfOrigin, DEFAULT_TEXTURE_SIZE, TextureIdentifierConstants.STARGATE_POO_SYMBOL + textureOffset);
+            stargatePooSymbolTextureId = StaticSTBHelper.resolveAndBindTexture(pointOfOrigin, width, height);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new InitializationException(e);
@@ -200,8 +205,9 @@ public abstract class GenericStargate {
         renderTextureCentered(bb, v1, v2, v3, v4, u1, u2, u3, u4);
     }
 
-    protected static void initRender(ContextSimpleBuffer contextSimpleBuffer) {
-        contextSimpleBuffer.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE + INDEX_TEXTURE_OFFSET);
+    protected void initRender(ContextSimpleBuffer contextSimpleBuffer) {
+        GL32C.glBindTexture(GL11C.GL_TEXTURE_2D, stargateTextureId);
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(0);
         contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
@@ -313,26 +319,30 @@ public abstract class GenericStargate {
 
     protected void useStargateTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE + INDEX_TEXTURE_OFFSET);
+        GL32C.glBindTexture(GL11C.GL_TEXTURE_2D, stargateTextureId);
+        bb.context().elementShader().updateTextureUniform(0);
         // not updating type uniform as it is already texture
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 
     protected void useEngagedStargateTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE_ENGAGED + INDEX_TEXTURE_OFFSET);
+        GL32C.glBindTexture(GL11C.GL_TEXTURE_2D, stargateEngagedTextureId);
+        bb.context().elementShader().updateTextureUniform(0);
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 
     protected void useSymbolsTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE_SYMBOLS + INDEX_TEXTURE_OFFSET);
+        GL32C.glBindTexture(GL11C.GL_TEXTURE_2D, stargateSymbolsTextureId);
+        bb.context().elementShader().updateTextureUniform(0);
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 
     protected void usePoOTexture(ContextSimpleBuffer bb) {
         bb.simpleBufferBuilder().draw();
-        bb.context().elementShader().updateTextureUniform(TextureIdentifierConstants.STARGATE_POO_SYMBOL + INDEX_TEXTURE_OFFSET);
+        GL32C.glBindTexture(GL11C.GL_TEXTURE_2D, stargatePooSymbolTextureId);
+        bb.context().elementShader().updateTextureUniform(0);
         bb.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
     }
 

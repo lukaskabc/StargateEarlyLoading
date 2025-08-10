@@ -12,12 +12,15 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper;
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.DisplayWindow;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleFont;
-import net.neoforged.fml.loading.FMLConfig;
-import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
+import net.minecraftforge.fml.earlydisplay.ColourScheme;
+import net.minecraftforge.fml.earlydisplay.DisplayWindow;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleFont;
+import net.minecraftforge.fml.loading.FMLConfig;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.ImmediateWindowProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
@@ -27,15 +30,13 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.ProgressBar.BAR_HEIGHT;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11C.glClearColor;
 
 /**
  * Main class extending default DisplayWindow.
@@ -44,10 +45,10 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
  * and use the existing implementation instead.
  */
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
-    public static final String WINDOW_PROVIDER = "StargateEarlyLoading";
+    public static final String EXPECTED_WINDOW_PROVIDER = "fmlearlywindow";
     public static final int MEMORY_BAR_OFFSET = 32;
     public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + MEMORY_BAR_OFFSET;
-    private static int globalAlpha = 255;
+    private static final Logger LOG = LogManager.getLogger();
     private static Vector2f center = new Vector2f(1, 1);
     private final RefDisplayWindow accessor;
     private final Config configuration;
@@ -76,16 +77,16 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     }
 
     /**
-     * Checks whether the FML configuration has the {@link #WINDOW_PROVIDER} set as the {@link FMLConfig.ConfigValue#EARLY_WINDOW_PROVIDER EARLY_WINDOW_PROVIDER}.
+     * Checks whether the FML configuration has the {@link #EXPECTED_WINDOW_PROVIDER} set as the {@link FMLConfig.ConfigValue#EARLY_WINDOW_PROVIDER EARLY_WINDOW_PROVIDER}.
      * <p>
      * If the value does not match,
      * an error message dialog is displayed to instruct the user to update the config.
      */
     private static void checkFMLConfig() {
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
-        if (!WINDOW_PROVIDER.equals(windowProvider)) {
+        if (!EXPECTED_WINDOW_PROVIDER.equals(windowProvider)) {
             // Create a parent frame that will appear in the taskbar
-            final JFrame frame = new JFrame("Missing NeoForge configuration");
+            final JFrame frame = new JFrame("Missing Forge configuration");
             frame.setAlwaysOnTop(true);
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.setLocationRelativeTo(null); // Center on screen
@@ -100,15 +101,15 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
                             
                             Do you wish to update the config?
                             Answering yes will update the config and exit the game.
-                            """.replace("WINDOW_PROVIDER", WINDOW_PROVIDER),
-                    "Missing NeoForge configuration",
+                            """.replace("WINDOW_PROVIDER", EXPECTED_WINDOW_PROVIDER),
+                    "Missing Forge configuration",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE
             );
             frame.dispose();
 
             if (answer == JOptionPane.YES_OPTION) {
-                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
+                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, EXPECTED_WINDOW_PROVIDER);
                 System.exit(0);
             }
         }
@@ -118,12 +119,15 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     /**
      * Constructs the elements to be rendered in the loading window.
      *
-     * @param mcVersion    The Minecraft version.
-     * @param forgeVersion The Forge version.
-     * @param elements     The list where render elements will be added.
+     * @param elements The list where render elements will be added.
      */
-    private void constructElements(@Nullable String mcVersion, String forgeVersion, final List<RenderElement> elements) {
+    private void constructElements(final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
+        //        final RenderElement anvil = elements.get(0); // I mean... do we really need it? we have stargates here!
+        final RenderElement logMessageOverlay = elements.get(1);
+        final RenderElement forgeVersionOverlay = elements.get(2);
+        elements.clear();
+
         elements.add(new Background(Helper.randomElement(configuration.getBackgrounds())).get());
         if (configuration.getLogoTexture() != null) {
             centeredLogo = new CenteredLogo(configuration.getLogoTexture(), configuration.getLogoTextureSize());
@@ -134,11 +138,12 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 // TODO fix element positions and scaling - test with fml scale
         // from forge early loading:
         // top middle memory info
+
         elements.add(RenderElement.performanceBar(font));
         // bottom left log messages
-        elements.add(RenderElement.logMessageOverlay(font));
+        elements.add(logMessageOverlay);
         // bottom right game version
-        elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
+        elements.add(forgeVersionOverlay);
     }
 
     /**
@@ -146,53 +151,67 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      */
     @Override
     public String name() {
-        return WINDOW_PROVIDER;
+        return EXPECTED_WINDOW_PROVIDER;
     }
 
     /**
-     * Calls the super method and sets the colour scheme to black.
+     * In Forge context should never be called.
      *
-     * @param arguments The arguments provided to the Java process.
-     *                  This is the entire command line, so you can process stuff from it.
-     * @return result of the super method
-     * @see DisplayWindow#initialize(String[])
+     * @throws AssertionError always
+     * @see #reinitializeAfterStateCopy()
      */
     @Override
     public Runnable initialize(String[] arguments) {
-        final Runnable result = super.initialize(arguments);
-        // force black colour scheme
-        accessor.setColourScheme(ColourScheme.BLACK);
-        return result;
+        throw new AssertionError("The Stargate Early Loading Window should not be initialized in Forge context!");
     }
 
     /**
-     * Reimplements the super method {@link DisplayWindow#start(String, String)}<br>
-     * and injects {@link #afterInitRender(String, String)}<br>
-     * that is called after {@link DisplayWindow#initRender(String, String)}
-     * <p>
-     * Starts the loading window rendering process.
-     * <p>
-     * Schedules the window's rendering initialization and sets up a periodic tick.
+     * In Forge context should never be called.
      *
-     * @param mcVersion    The Minecraft version.
-     * @param forgeVersion The Forge version.
-     * @return A Runnable responsible for the periodic tick.
-     * @see DisplayWindow#start(String, String)
+     * @throws AssertionError always
+     * @see #reinitializeAfterStateCopy()
      */
     @Override
-    public Runnable start(@Nullable String mcVersion, String forgeVersion) {
-        final ScheduledExecutorService renderScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            final Thread thread = Executors.defaultThreadFactory().newThread(r);
-            thread.setDaemon(true);
-            return thread;
-        });
-        accessor.setRenderScheduler(renderScheduler);
-        initWindow(mcVersion);
-        final var initializationFuture = renderScheduler.schedule(() -> {
-            accessor.initRender(mcVersion, forgeVersion);
-            afterInitRender(mcVersion, forgeVersion);
+    public Runnable start(String mcVersion, String forgeVersion) {
+        throw new AssertionError("The Stargate Early Loading Window should not be initialized in Forge context!");
+    }
+
+    public Runnable reinitializeAfterStateCopy() {
+        // from initialize method
+        accessor.setColourScheme(ColourScheme.BLACK);
+        // from start method
+        final var future = accessor.getRenderScheduler().schedule(() -> {
+            try {
+                accessor.getRenderLock().acquire(); // block rendering
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+            // from initWindow
+            // rebind callbacks to the new instance
+            glfwSetFramebufferSizeCallback(accessor.getGlWindow(), accessor::fbResize);
+            glfwSetWindowPosCallback(accessor.getGlWindow(), accessor::winMove);
+            glfwSetWindowSizeCallback(accessor.getGlWindow(), accessor::winResize);
+
+            // cancel the old window tick
+            if (accessor.getWindowTick() != null) {
+                while (!accessor.getWindowTick().isDone()) {
+                    accessor.getWindowTick().cancel(false);
+                }
+            } else {
+                // TODO: this is potentially a problem, if the window tick was null,
+                //  then the window was already handed over to the game
+                LOG.error("Early window was already handed over to the game - that was fast! Aborting Stargate Early Loading initialization.");
+                return;
+            }
+            // from initRender
+            accessor.setWindowTick(accessor.getRenderScheduler().scheduleAtFixedRate(accessor::renderThreadFunc, 50, 50, TimeUnit.MILLISECONDS));
+            accessor.getRenderScheduler().scheduleAtFixedRate(() -> accessor.getAnimationTimerTrigger().set(true), 1, 50, TimeUnit.MILLISECONDS);
+            afterInitRender();
+            accessor.getRenderLock().release();
         }, 1, TimeUnit.MILLISECONDS);
-        accessor.setInitializationFuture(initializationFuture);
+        accessor.setInitializationFuture(future);
         return this::periodicTick;
     }
 
@@ -201,28 +220,19 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * <p>
      * Establishes the OpenGL context, recreates the render context, and constructs render elements.
      *
-     * @param mcVersion    The Minecraft version.
-     * @param forgeVersion The Forge version.
      * @implNote The method is called after init render is called inside the same schedule.
      * Since the scheduler is single threaded there is no possibility for race condition
      * with other scheduled tasks.
      */
-    private void afterInitRender(@Nullable String mcVersion, String forgeVersion) {
+    public void afterInitRender() {
         glfwMakeContextCurrent(accessor.getGlWindow());
+        // Set the clear color based on the colour scheme
+        final ColourScheme colourScheme = accessor.getColourScheme();
+        glClearColor(colourScheme.background().redf(), colourScheme.background().greenf(), colourScheme.background().bluef(), 1f);
         recreateContext();
         final List<RenderElement> elements = accessor.getElements();
-        elements.clear();
-        constructElements(mcVersion, forgeVersion, elements);
+        constructElements(elements);
         glfwMakeContextCurrent(0);
-    }
-
-    /**
-     * Returns the current global alpha transparency value.
-     *
-     * @return The global alpha value.
-     */
-    public static int getGlobalAlpha() {
-        return globalAlpha;
     }
 
     /**
@@ -237,9 +247,9 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      */
     @Override
     public void updateModuleReads(final ModuleLayer layer) {
-        var fm = layer.findModule("neoforge").orElseThrow();
+        var fm = layer.findModule("forge").orElseThrow();
         getClass().getModule().addReads(fm);
-        var clz = Class.forName(fm, "net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay");
+        var clz = FMLLoader.getGameLayer().findModule("forge").map(l -> Class.forName(l, "net.minecraftforge.client.loading.ForgeLoadingOverlay")).orElseThrow();
         var methods = Arrays.stream(clz.getMethods()).filter(m -> Modifier.isStatic(m.getModifiers())).collect(Collectors.toMap(Method::getName, Function.identity()));
         accessor.setLoadingOverlay(methods.get("newInstance"));
     }
@@ -283,7 +293,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
             centeredLogo.setFadeOutStart(accessor.getFrameCount());
             delayMojang = 5;
         }
-        accessor.getElements().addLast(new MojangLogo(textureId, accessor.getFrameCount() + delayMojang).get());
+        accessor.getElements().add(new MojangLogo(textureId, accessor.getFrameCount() + delayMojang).get());
     }
 
     /**
@@ -306,20 +316,6 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     }
 
     /**
-     * Renders the window.
-     * <p>
-     * Sets the global alpha value and delegates rendering to the superclass.
-     *
-     * @param alpha The alpha transparency to use.
-     * @see DisplayWindow#render(int)
-     */
-    @Override
-    public void render(int alpha) {
-        globalAlpha = alpha;
-        super.render(alpha);
-    }
-
-    /**
      * Recreates the rendering context overriding the frame buffer resolution set by the original DisplayWindow implementation.
      * <p>
      * Updates the frame buffer size according to OpenGL window frame buffer size,
@@ -335,12 +331,15 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         final int[] height = new int[1];
         glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
         accessor.setFBSize(width[0], height[0]);
+
+        LOG.debug("The available size of the framebuffer in the window is {}x{}", width[0], height[0]);
+
         final RenderElement.DisplayContext context = new RenderElement.DisplayContext(
                 width[0],
                 height[0],
                 oldContext.scale(),
                 oldContext.elementShader(),
-                oldContext.colourScheme(),
+                accessor.getColourScheme(),
                 oldContext.performance()
         );
         accessor.setContext(context);

@@ -11,7 +11,7 @@ import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RefDialingStrategy extends ReflectionAccessor {
+public class RefDialingStrategy {
     private static final List<Class<? extends DialingStrategy>> DIALING_STRATEGIES = List.of(
             MilkyWay2Step.class,
             MilkyWay3Step.class,
@@ -22,11 +22,6 @@ public class RefDialingStrategy extends ReflectionAccessor {
             UniverseLoading.class
     );
     private static final Logger LOG = LogManager.getLogger();
-
-    private RefDialingStrategy(Object target) {
-        super(target);
-        throw new AssertionError();
-    }
 
     public static Class<? extends DialingStrategy> resolveDialingStrategy(String dialingStrategyName) {
         final String lowerName = dialingStrategyName.toLowerCase();

@@ -7,31 +7,12 @@ import java.lang.invoke.VarHandle;
 
 /**
  * Allows reflection access to private fields and methods.
+ *
  * @implNote Using {@link MethodHandle} should be more performant than using {@link java.lang.reflect} api.
  */
-public abstract class ReflectionAccessor {
-    protected final Object target;
-    protected final Class<?> clazz;
-
-    /**
-     * Initializes the accessor with the target object and its class.
-     *
-     * @param target the object to access
-     * @see Object#getClass()
-     */
-    protected ReflectionAccessor(Object target) {
-        this(target, target.getClass());
-    }
-
-    /**
-     * Initializes the accessor with the target object and the class.
-     *
-     * @param target the object to access
-     * @param clazz  the class of the object where the fields and methods are located
-     */
-    protected ReflectionAccessor(Object target, Class<?> clazz) {
-        this.target = target;
-        this.clazz = clazz;
+public class ReflectionAccessor {
+    private ReflectionAccessor() {
+        throw new AssertionError();
     }
 
     protected static MethodHandles.Lookup privateLookup(final Class<?> targetClass) {

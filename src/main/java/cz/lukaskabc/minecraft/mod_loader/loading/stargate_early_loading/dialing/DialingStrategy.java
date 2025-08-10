@@ -2,7 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.dialing
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
-import net.neoforged.fml.loading.progress.ProgressMeter;
+import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
 import java.util.*;
 
@@ -81,7 +81,7 @@ public abstract class DialingStrategy {
 
     public float getEarlyProgress(final List<ProgressMeter> progressMeters) {
         if (progressMeters.size() == 1) {
-            final String label = progressMeters.getFirst().label().getText();
+            final String label = progressMeters.get(0).label().getText();
             if (anyEarlyLabelStartsWith(label)) {
                 earlyLabels.add(label);
             }

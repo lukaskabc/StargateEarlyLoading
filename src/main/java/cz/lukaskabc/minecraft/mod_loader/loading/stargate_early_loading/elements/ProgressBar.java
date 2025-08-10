@@ -3,9 +3,10 @@ package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.element
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefSimpleFont;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.TextureRenderer;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
-import net.neoforged.fml.earlydisplay.*;
+import net.minecraftforge.fml.earlydisplay.*;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.getGlobalAlpha;
+import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.getGlobalAlpha;
+
 
 public class ProgressBar {
     public static final int BAR_HEIGHT = 20;

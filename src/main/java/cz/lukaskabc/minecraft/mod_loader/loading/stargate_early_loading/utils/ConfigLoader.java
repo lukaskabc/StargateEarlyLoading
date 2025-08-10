@@ -12,7 +12,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.UniverseStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateType;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

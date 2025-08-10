@@ -1,38 +1,24 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.exception.InitializationException;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.StaticSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ContextSimpleBuffer;
-import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.TextureIdentifierConstants;
-import net.neoforged.fml.earlydisplay.*;
+import net.minecraftforge.fml.earlydisplay.*;
 import org.jline.utils.Log;
 import org.jspecify.annotations.Nullable;
 
 import java.io.FileNotFoundException;
-import java.util.function.Supplier;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.StargateEarlyLoadingWindow.MEMORY_BAR_HEIGHT;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo.LOGO_NEGATIVE_HEIGHT_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.MojangLogo.LOGO_WIDTH;
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
-public class CenteredLogo implements Supplier<RenderElement> {
-    private static final int DEFAULT_TEXTURE_SIZE = 11195;
+public class CenteredLogo implements ElementSupplier {
     private final int[] textureSize;
     private int fadeOutStart = -1;
-
-    /**
-     * File path to the texture relative to the mod config directory or classpath.
-     *
-     * @see cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original.STBHelper#resolveAndBindTexture(String, int, int)
-     */
-    @Nullable
-    private final String texture;
-
+    private final int textureId;
 
     /**
      * Constructs a Centered Logo with a specified texture.
@@ -44,27 +30,13 @@ public class CenteredLogo implements Supplier<RenderElement> {
         if (texture == null) {
             throw new InitializationException("Centered logo texture is null");
         }
-        this.texture = texture;
         this.textureSize = textureSize;
-    }
-
-
-    /**
-     * Returns a RenderElement rendering the logo texture.
-     *
-     * @return a RenderElement for rendering the background.
-     * @throws InitializationException if texture loading fails.
-     */
-    @Override
-    public RenderElement get() {
         try {
-            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + TextureIdentifierConstants.CENTERED_LOGO + INDEX_TEXTURE_OFFSET);
+            textureId = StaticSTBHelper.resolveAndBindTexture(texture, new int[1], new int[1]);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new InitializationException(e);
         }
-
-        return RefRenderElement.constructor(this::render);
     }
 
     /**
@@ -75,12 +47,13 @@ public class CenteredLogo implements Supplier<RenderElement> {
      * @param contextSimpleBuffer the buffer context for rendering.
      * @param frame               the current frame number.
      */
-    private void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
+    @Override
+    public void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
         final RenderElement.DisplayContext ctx = contextSimpleBuffer.context();
         final SimpleBufferBuilder bb = contextSimpleBuffer.simpleBufferBuilder();
-        contextSimpleBuffer.context().elementShader().updateTextureUniform(TextureIdentifierConstants.CENTERED_LOGO + INDEX_TEXTURE_OFFSET);
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(0);
         contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
-        glBindTexture(GL_TEXTURE_2D, TextureIdentifierConstants.CENTERED_LOGO + INDEX_TEXTURE_OFFSET);
+        glBindTexture(GL_TEXTURE_2D, textureId);
 
         bb.begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
 
