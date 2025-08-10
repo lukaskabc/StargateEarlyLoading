@@ -15,33 +15,43 @@ Yes, including the NeoForge's **early loading** with a custom **animated** one, 
 [Empty modpack loading (YouTube)](https://youtu.be/-zaa9cX18TU)  
 [ATM10 with the custom loading (YouTube)](https://youtu.be/ozuZtOppDks)
 
-## Setup
-
-How to install the _mod_
+## Setup - NeoForge
 
 1. Place the jar in the `mods` directory.
 2. Go to `config/fml.toml` and set:
 
-**Note that resizing the window during loading is not supported.**
-
 ```toml
 earlyWindowControl = true
 earlyWindowProvider = "StargateEarlyLoading"
+# ... Other options ...
 # I also recommend to set
 earlyWindowFBScale = 1
 earlyWindowMaximized = true
 ```
 
 3. **Optionally** install `DelayedLoadingOverlay`, which will extend the game loading until the stargate animation is
-   finished.
+   finished (in case the game loading finished first).
 
-If you dont want the window to maximize at start, but you also want higher resolution
-(possibly after maximizing the window manually), you can try
+## Setup - Forge:
+
+1. place the jar in the mods folder
+2. forge version requires default `config/fml.toml` value
 
 ```toml
-earlyWindowFBScale = 2
-earlyWindowMaximized = false
+earlyWindowProvider = "fmlearlywindow"
+# ... Other options ...
+# I also recommend to set
+earlyWindowFBScale = 1
+earlyWindowMaximized = true
 ```
+
+Unfortunately, the override is applied quite late,
+which may result in the original red early loading (or a white screen) to "flash" on the very game start.
+I can't do anything about that.
+
+However, the red color of the original loading can be changed to black using
+
+3. Optional: update `options.txt` file: `darkMojangStudiosBackground:true`
 
 ## Customization
 
