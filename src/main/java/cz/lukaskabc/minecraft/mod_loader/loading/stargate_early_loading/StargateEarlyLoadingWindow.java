@@ -8,6 +8,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDialingStrategy;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefEarlyFrameBuffer;
+import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefPerformanceInfo;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.GenericStargate;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
@@ -15,6 +16,8 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.He
 import net.neoforged.fml.earlydisplay.*;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joml.Vector2f;
 import org.jspecify.annotations.Nullable;
 
@@ -41,6 +44,7 @@ import static org.lwjgl.glfw.GLFW.*;
  */
 public class StargateEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final String WINDOW_PROVIDER = "StargateEarlyLoading";
+    private static final Logger LOG = LogManager.getLogger();
     public static final int MEMORY_BAR_OFFSET = 32;
     public static final int MEMORY_BAR_HEIGHT = BAR_HEIGHT + MEMORY_BAR_OFFSET;
     private static int globalAlpha = 255;
@@ -155,10 +159,28 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      */
     @Override
     public Runnable initialize(String[] arguments) {
-        final Runnable result = super.initialize(arguments);
-        // force black colour scheme
+        try {
+            final Runnable result = super.initialize(arguments);
+            // force black colour scheme
+            accessor.setColourScheme(ColourScheme.BLACK);
+            return result;
+        } catch (Exception e) {
+            LOG.error("Error initializing early display window, the game will attempt to continue to start.", e);
+            initDefault();
+            LOG.warn("Early window initialized with minimal default values, proceeding to start with unknown game and forge versions.");
+            return start("unknown", "unknown");
+        }
+    }
+
+    /**
+     * Alternative to {@link #initialize(String[])}
+     * that initialize minimal objects attributes required to avoid crash.
+     */
+    private void initDefault() {
+        accessor.setWindowSize(854, 480);
+        accessor.setFBScale(1);
         accessor.setColourScheme(ColourScheme.BLACK);
-        return result;
+        accessor.setPerformanceInfo(RefPerformanceInfo.create());
     }
 
     /**
