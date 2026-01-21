@@ -31,6 +31,8 @@ public class RefDisplayWindow extends ReflectionAccessor {
     private static final VarHandle maximized = findField(lookup, "maximized", boolean.class);
     private static final VarHandle fbWidth = findField(lookup, "fbWidth", int.class);
     private static final VarHandle fbHeight = findField(lookup, "fbHeight", int.class);
+    private static final VarHandle winWidth = findField(lookup, "winWidth", int.class);
+    private static final VarHandle winHeight = findField(lookup, "winHeight", int.class);
     private static final VarHandle context = findField(lookup, "context", RenderElement.DisplayContext.class);
     private static final VarHandle framebuffer = findField(lookup, "framebuffer", EarlyFramebuffer.class);
     private static final VarHandle framecount = findField(lookup, "framecount", int.class);
@@ -167,5 +169,18 @@ public class RefDisplayWindow extends ReflectionAccessor {
         } catch (Throwable e) {
             throw new ReflectionException(e);
         }
+    }
+
+    public void setWindowSize(int width, int height) {
+        winWidth.set(target, width);
+        winHeight.set(target, height);
+    }
+
+    public int getWinWidth() {
+        return (int) winWidth.get(target);
+    }
+
+    public int getWinHeight() {
+        return (int) winHeight.get(target);
     }
 }

@@ -12,10 +12,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper;
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.DisplayWindow;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleFont;
+import net.neoforged.fml.earlydisplay.*;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.joml.Vector2f;
@@ -34,8 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.elements.ProgressBar.BAR_HEIGHT;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Main class extending default DisplayWindow.
@@ -188,12 +184,27 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         });
         accessor.setRenderScheduler(renderScheduler);
         initWindow(mcVersion);
+
+        if (configuration.isAutoResize()) {
+            glfwSetFramebufferSizeCallback(accessor.getGlWindow(), this::onFrameBufferResize);
+        }
+
         final var initializationFuture = renderScheduler.schedule(() -> {
             accessor.initRender(mcVersion, forgeVersion);
             afterInitRender(mcVersion, forgeVersion);
         }, 1, TimeUnit.MILLISECONDS);
         accessor.setInitializationFuture(initializationFuture);
         return this::periodicTick;
+    }
+
+
+    private void onFrameBufferResize(long window, int width, int height) {
+        width = size(width);
+        height = size(height);
+        if (accessor.getFbWidth() != width || accessor.getFbHeight() != height) {
+            accessor.setFBSize(width, height);
+            accessor.getRenderScheduler().schedule(this::recreateContext, 1, TimeUnit.MILLISECONDS);
+        }
     }
 
     /**
@@ -208,8 +219,8 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * with other scheduled tasks.
      */
     private void afterInitRender(@Nullable String mcVersion, String forgeVersion) {
-        glfwMakeContextCurrent(accessor.getGlWindow());
         recreateContext();
+        glfwMakeContextCurrent(accessor.getGlWindow());
         final List<RenderElement> elements = accessor.getElements();
         elements.clear();
         constructElements(mcVersion, forgeVersion, elements);
@@ -316,6 +327,19 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     @Override
     public void render(int alpha) {
         globalAlpha = alpha;
+        final int[] width = new int[1];
+        final int[] height = new int[1];
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
+        if (configuration.isAutoResize() && (
+                accessor.getFbWidth() != width[0] ||
+                        accessor.getWinWidth() != width[0] ||
+                        accessor.getFbHeight() != height[0] ||
+                        accessor.getWinHeight() != height[0])) {
+            recreateDisplayContext();
+            recreateFramebuffer();
+        }
         super.render(alpha);
     }
 
@@ -329,12 +353,25 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * The old frame buffer is closed to release the resources.
      */
     private void recreateContext() {
+        accessor.getRenderLock().acquireUninterruptibly();
+        glfwMakeContextCurrent(accessor.getGlWindow());
+        recreateDisplayContext();
+        recreateFramebuffer();
+        glfwMakeContextCurrent(0);
+        accessor.getRenderLock().release();
+    }
+
+    private void recreateDisplayContext() {
         final RenderElement.DisplayContext oldContext = accessor.getContext();
-        final Object oldFrameBuffer = accessor.getFramebuffer();
         final int[] width = new int[1];
         final int[] height = new int[1];
+
         glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
         accessor.setFBSize(width[0], height[0]);
+        accessor.setWindowSize(width[0], height[0]);
+
         final RenderElement.DisplayContext context = new RenderElement.DisplayContext(
                 width[0],
                 height[0],
@@ -343,9 +380,18 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
                 oldContext.colourScheme(),
                 oldContext.performance()
         );
-        accessor.setContext(context);
-        accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
         setCenter(context.scaledWidth() / 2, context.scaledHeight() / 2);
+        accessor.setContext(context);
+    }
+
+    private void recreateFramebuffer() {
+        final RenderElement.DisplayContext context = accessor.getContext();
+        final EarlyFramebuffer oldFrameBuffer = accessor.getFramebuffer();
+        accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
         RefEarlyFrameBuffer.close(oldFrameBuffer);
+    }
+
+    private static int size(int size) {
+        return Math.max(1, size);
     }
 }
