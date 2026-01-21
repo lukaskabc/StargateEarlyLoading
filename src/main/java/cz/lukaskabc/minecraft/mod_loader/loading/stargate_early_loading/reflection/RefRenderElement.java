@@ -10,9 +10,7 @@ import java.util.function.Supplier;
 public class RefRenderElement extends ReflectionAccessor {
     public static final Class<?> RENDERER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Renderer");
     public static final Class<?> INITIALIZER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Initializer");
-    public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
     private static final MethodHandles.Lookup lookup = privateLookup(RenderElement.class);
-    public static final int INDEX_TEXTURE_OFFSET = (int) findStaticField(lookup, "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
     private static final MethodHandle constructor = findConstructor(lookup, INITIALIZER_CLASS);
 
     public RefRenderElement(RenderElement target) {

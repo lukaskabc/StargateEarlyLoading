@@ -9,6 +9,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.original;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryUtil;
@@ -28,7 +29,7 @@ public class STBHelper {
     public static ByteBuffer readToBuffer(final InputStream inputStream, int initialCapacity) {
         ByteBuffer buf;
         try (var channel = Channels.newChannel(inputStream)) {
-            buf = BufferUtils.createByteBuffer(initialCapacity);
+            buf = BufferUtils.createByteBuffer(initialCapacity + 1);
             while (true) {
                 var readbytes = channel.read(buf);
                 if (readbytes == -1) break;
@@ -46,25 +47,31 @@ public class STBHelper {
         return MemoryUtil.memSlice(buf); // we trim the final buffer to the size of the content
     }
 
-    public static void resolveAndBindTexture(String file, int size, int textureNumber) throws FileNotFoundException {
-        int[] lw = new int[1];
-        int[] lh = new int[1];
+    public static void resolveAndBindTexture(String file, int textureId) throws FileNotFoundException {
         int[] lc = new int[1];
-        final ByteBuffer img = loadImageFromClasspath(file, size, lw, lh, lc);
-        int texid = glGenTextures();
-        glActiveTexture(textureNumber);
-        glBindTexture(GL_TEXTURE_2D, texid);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lw[0], lh[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
-        glActiveTexture(GL_TEXTURE0);
-        MemoryUtil.memFree(img);
+        int[] fileSize = new int[]{300000}; // default texture size 30kB
+        int[] textureWidth = new int[1];
+        int[] textureHeight = new int[1];
+
+        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file), fileSize);
+        ByteBuffer buf = readToBuffer(inputStream, fileSize[0]);
+        final ByteBuffer img = STBImage.stbi_load_from_memory(buf, textureWidth, textureHeight, lc, 4);
+
+        bindTexture(img, textureId, textureWidth, textureHeight);
     }
 
-    public static ByteBuffer loadImageFromClasspath(String file, int size, int[] width, int[] height, int[] channels) throws FileNotFoundException {
-        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
-        ByteBuffer buf = readToBuffer(inputStream, size);
-        return STBImage.stbi_load_from_memory(buf, width, height, channels, 4);
+    /**
+     * The byte buffer will be freed.
+     */
+    public static void bindTexture(@Nullable ByteBuffer textureData, int textureId, int[] width, int[] height) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        MemoryUtil.memFree(textureData);
     }
 
     private STBHelper() {

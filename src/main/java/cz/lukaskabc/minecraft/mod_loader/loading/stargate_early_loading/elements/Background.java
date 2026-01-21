@@ -15,9 +15,9 @@ import org.jspecify.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.util.function.Supplier;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.BufferHelper.COLOR;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11C.glBindTexture;
 
 /**
  * Background element rendering static texture.
@@ -57,7 +57,7 @@ public class Background implements Supplier<RenderElement> {
     @Override
     public RenderElement get() {
         try {
-            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + TextureIdentifierConstants.BACKGROUND + INDEX_TEXTURE_OFFSET);
+            STBHelper.resolveAndBindTexture(texture, TextureIdentifierConstants.BACKGROUND);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new InitializationException(e);
@@ -72,8 +72,9 @@ public class Background implements Supplier<RenderElement> {
      * @param frame               the current frame number.
      */
     private void render(ContextSimpleBuffer contextSimpleBuffer, int frame) {
-        contextSimpleBuffer.context().elementShader().updateTextureUniform(TextureIdentifierConstants.BACKGROUND + INDEX_TEXTURE_OFFSET);
+        contextSimpleBuffer.context().elementShader().updateTextureUniform(0);
         contextSimpleBuffer.context().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
+        glBindTexture(GL_TEXTURE_2D, TextureIdentifierConstants.BACKGROUND);
         contextSimpleBuffer.simpleBufferBuilder().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
         QuadHelper.loadQuad(contextSimpleBuffer.simpleBufferBuilder(), 0f, contextSimpleBuffer.context().scaledWidth(), 0f, contextSimpleBuffer.context().scaledHeight(), 0f, 1f, 0f, 1f, COLOR);
         contextSimpleBuffer.simpleBufferBuilder().draw();

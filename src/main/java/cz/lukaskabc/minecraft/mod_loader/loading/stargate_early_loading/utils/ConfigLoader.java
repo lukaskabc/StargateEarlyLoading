@@ -15,6 +15,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate
 import net.neoforged.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -120,12 +121,13 @@ public class ConfigLoader {
     /**
      * Tries to resolve file inside {@link #getConfigDirectory()} otherwise resolves file from resources on classpath
      */
-    public static InputStream resolveFile(Path path) throws FileNotFoundException {
+    public static InputStream resolveFile(Path path, int @Nullable [] size) throws FileNotFoundException {
         if (path.startsWith("/") || path.startsWith("\\")) {
             path = Path.of(path.toString().substring(1));
         }
         final Path configDir = getConfigDirectory().resolve(path);
         if (Files.exists(configDir)) {
+            readSize(configDir, size);
             return new FileInputStream(configDir.toFile());
         }
 
@@ -134,7 +136,30 @@ public class ConfigLoader {
         if (result == null) {
             throw new FileNotFoundException(configDir.toString());
         }
+        readSize(Path.of(classPath), size);
         return result;
+    }
+
+    private static void readSize(Path path, int @Nullable [] size) {
+        if (Files.exists(path)) {
+            try {
+                safeLongToInt(size, Files.size(path));
+            } catch (IOException e) {
+                throw new InitializationException(e);
+            }
+        }
+    }
+
+    private static void safeLongToInt(int @Nullable [] size, long value) {
+        if (size == null) {
+            return;
+        }
+        try {
+            size[0] = Math.toIntExact(value);
+        } catch (ArithmeticException e) {
+            LOG.error("File size is too big: {}. Max integer size is {}", value, Integer.MAX_VALUE);
+            throw new InitializationException(e);
+        }
     }
 
     public static StargateVariant loadStargateVariant(StargateType type, String variant) {
@@ -142,7 +167,7 @@ public class ConfigLoader {
         final Path configPath = path.resolve(variant + ".json");
 
         try {
-            return GSON.fromJson(new InputStreamReader(resolveFile(configPath)), StargateVariant.class);
+            return GSON.fromJson(new InputStreamReader(resolveFile(configPath, new int[1])), StargateVariant.class);
         } catch (JsonParseException | FileNotFoundException e) {
             LOG.atError().log("Failed to load stargate variant:{}", e.getMessage());
             throw new InitializationException(e);
