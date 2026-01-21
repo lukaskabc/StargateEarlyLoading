@@ -362,12 +362,10 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * The old frame buffer is closed to release the resources.
      */
     private void recreateContext() {
-        accessor.getRenderLock().acquireUninterruptibly();
         glfwMakeContextCurrent(accessor.getGlWindow());
         recreateDisplayContext();
         recreateFramebuffer();
         glfwMakeContextCurrent(0);
-        accessor.getRenderLock().release();
     }
 
     private void recreateDisplayContext() {
@@ -386,7 +384,7 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
                 height[0],
                 oldContext.scale(),
                 oldContext.elementShader(),
-                oldContext.colourScheme(),
+                accessor.getColourScheme(),
                 oldContext.performance()
         );
         setCenter(context.scaledWidth() / 2, context.scaledHeight() / 2);
