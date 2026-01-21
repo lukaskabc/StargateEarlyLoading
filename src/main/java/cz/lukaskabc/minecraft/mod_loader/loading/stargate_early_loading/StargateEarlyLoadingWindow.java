@@ -12,10 +12,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.stargate.variant.StargateVariant;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.ConfigLoader;
 import cz.lukaskabc.minecraft.mod_loader.loading.stargate_early_loading.utils.Helper;
-import net.minecraftforge.fml.earlydisplay.ColourScheme;
-import net.minecraftforge.fml.earlydisplay.DisplayWindow;
-import net.minecraftforge.fml.earlydisplay.RenderElement;
-import net.minecraftforge.fml.earlydisplay.SimpleFont;
+import net.minecraftforge.fml.earlydisplay.*;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.ImmediateWindowProvider;
@@ -190,7 +187,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
 
             // from initWindow
             // rebind callbacks to the new instance
-            glfwSetFramebufferSizeCallback(accessor.getGlWindow(), accessor::fbResize);
+            if (configuration.isAutoResize()) {
+                glfwSetFramebufferSizeCallback(accessor.getGlWindow(), this::onFrameBufferResize);
+            } else {
+                glfwSetFramebufferSizeCallback(accessor.getGlWindow(), accessor::fbResize);
+            }
             glfwSetWindowPosCallback(accessor.getGlWindow(), accessor::winMove);
             glfwSetWindowSizeCallback(accessor.getGlWindow(), accessor::winResize);
 
@@ -215,6 +216,16 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
         return this::periodicTick;
     }
 
+
+    private void onFrameBufferResize(long window, int width, int height) {
+        width = size(width);
+        height = size(height);
+        if (accessor.getFbWidth() != width || accessor.getFbHeight() != height) {
+            accessor.fbResize(window, width, height);
+            accessor.getRenderScheduler().schedule(this::recreateContext, 1, TimeUnit.MILLISECONDS);
+        }
+    }
+
     /**
      * Performs post-render initialization.
      * <p>
@@ -225,11 +236,11 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * with other scheduled tasks.
      */
     public void afterInitRender() {
+        recreateContext();
         glfwMakeContextCurrent(accessor.getGlWindow());
         // Set the clear color based on the colour scheme
         final ColourScheme colourScheme = accessor.getColourScheme();
         glClearColor(colourScheme.background().redf(), colourScheme.background().greenf(), colourScheme.background().bluef(), 1f);
-        recreateContext();
         final List<RenderElement> elements = accessor.getElements();
         constructElements(elements);
         glfwMakeContextCurrent(0);
@@ -316,6 +327,32 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
     }
 
     /**
+     * Renders the window.
+     * <p>
+     * Sets the global alpha value and delegates rendering to the superclass.
+     *
+     * @param alpha The alpha transparency to use.
+     * @see DisplayWindow#render(int)
+     */
+    @Override
+    public void render(int alpha) {
+        final int[] width = new int[1];
+        final int[] height = new int[1];
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
+        if (configuration.isAutoResize() && (
+                accessor.getFbWidth() != width[0] ||
+                        accessor.getWinWidth() != width[0] ||
+                        accessor.getFbHeight() != height[0] ||
+                        accessor.getWinHeight() != height[0])) {
+            recreateDisplayContext();
+            recreateFramebuffer();
+        }
+        super.render(alpha);
+    }
+
+    /**
      * Recreates the rendering context overriding the frame buffer resolution set by the original DisplayWindow implementation.
      * <p>
      * Updates the frame buffer size according to OpenGL window frame buffer size,
@@ -325,26 +362,45 @@ public class StargateEarlyLoadingWindow extends DisplayWindow implements Immedia
      * The old frame buffer is closed to release the resources.
      */
     private void recreateContext() {
+        accessor.getRenderLock().acquireUninterruptibly();
+        glfwMakeContextCurrent(accessor.getGlWindow());
+        recreateDisplayContext();
+        recreateFramebuffer();
+        glfwMakeContextCurrent(0);
+        accessor.getRenderLock().release();
+    }
+
+    private void recreateDisplayContext() {
         final RenderElement.DisplayContext oldContext = accessor.getContext();
-        final Object oldFrameBuffer = accessor.getFramebuffer();
         final int[] width = new int[1];
         final int[] height = new int[1];
-        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
-        accessor.setFBSize(width[0], height[0]);
 
-        LOG.debug("The available size of the framebuffer in the window is {}x{}", width[0], height[0]);
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
+        accessor.setFBSize(width[0], height[0]);
+        accessor.setWindowSize(width[0], height[0]);
 
         final RenderElement.DisplayContext context = new RenderElement.DisplayContext(
                 width[0],
                 height[0],
                 oldContext.scale(),
                 oldContext.elementShader(),
-                accessor.getColourScheme(),
+                oldContext.colourScheme(),
                 oldContext.performance()
         );
-        accessor.setContext(context);
-        accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
         setCenter(context.scaledWidth() / 2, context.scaledHeight() / 2);
+        accessor.setContext(context);
+    }
+
+    private void recreateFramebuffer() {
+        final RenderElement.DisplayContext context = accessor.getContext();
+        final EarlyFramebuffer oldFrameBuffer = accessor.getFramebuffer();
+        accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
         RefEarlyFrameBuffer.close(oldFrameBuffer);
+    }
+
+    private static int size(int size) {
+        return Math.max(1, size);
     }
 }

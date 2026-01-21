@@ -19,6 +19,7 @@ public class Config {
     private int logoWidth = 0;
     private int logoHeight = 0;
     private List<Integer> chevronOrder = List.of(1, 2, 3, 4, 5, 6, 7, 8);
+    private boolean autoResize = true;
 
     private Map<StargateType, String> defaultDialingStrategies = Map.of(
             StargateType.MILKY_WAY, MilkyWay2Step.class.getSimpleName(),
@@ -141,6 +142,14 @@ public class Config {
 
     public void setLogoHeight(int logoHeight) {
         this.logoHeight = logoHeight;
+    }
+
+    public boolean isAutoResize() {
+        return autoResize;
+    }
+
+    public void setAutoResize(boolean autoResize) {
+        this.autoResize = autoResize;
     }
 
     // endregion

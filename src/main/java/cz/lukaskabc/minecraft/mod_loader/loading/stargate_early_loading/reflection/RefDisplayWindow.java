@@ -176,6 +176,11 @@ public class RefDisplayWindow {
         }
     }
 
+    public void setWindowSize(int width, int height) {
+        winWidth.set(target, width);
+        winHeight.set(target, height);
+    }
+
     public int getWinWidth() {
         return (int) winWidth.get(target);
     }
